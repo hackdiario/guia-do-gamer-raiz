@@ -5,7 +5,7 @@
     "resumo": "Entenda sockets, VRMs, linhas PCIe e como identificar se uma placa suporta upgrades futuros sem gargalos elétricos.",
     "categoria": "Hardware Base",
     "status": "Publicada",
-    "slug": "exemplo-topico",
+    "slug": "placa-mae",
     "tags": ["Placa-Mãe", "VRM", "PCIe", "Socket"]
   },
   {
@@ -52,5 +52,77 @@
     "status": "Em breve",
     "slug": "configuracao-bios",
     "tags": ["BIOS", "UEFI", "ReBAR", "Boot"]
+  },
+  {
+    "id": "07",
+    "titulo": "GPU, VRAM e Análise de Gargalo Real",
+    "resumo": "Largura de banda, barramento de memória, esgotamento de VRAM e leitura de frametime vs FPS médio.",
+    "categoria": "Hardware Base",
+    "status": "Em breve",
+    "slug": "gpu-vram-e-gargalos",
+    "tags": ["GPU", "VRAM", "Frametime", "Gargalo"]
+  },
+  {
+    "id": "08",
+    "titulo": "CPU: IPC, Cache L1/L2/L3 e Escalonamento",
+    "resumo": "Como arquitetura, cache e distribuição de threads impactam jogos competitivos e mundos abertos.",
+    "categoria": "Hardware Base",
+    "status": "Em breve",
+    "slug": "cpu-cache-ipc-e-agendamento",
+    "tags": ["CPU", "Cache L3", "IPC", "Threads"]
+  },
+  {
+    "id": "09",
+    "titulo": "Airflow, Pressão Positiva/Negativa e Pasta Térmica",
+    "resumo": "Fluxo de ar, pressão estática vs CFM, montagem de fans, AIO vs air cooler e hotspot.",
+    "categoria": "Energia & Refrigeração",
+    "status": "Em breve",
+    "slug": "airflow-pressao-e-termica",
+    "tags": ["Airflow", "Thermal", "Pasta Térmica", "Hotspot"]
+  },
+  {
+    "id": "10",
+    "titulo": "Latência de Ponta a Ponta, Frametime e Frame Generation",
+    "resumo": "Input lag, pipeline de renderização, V-Sync, G-Sync/FreeSync, Reflex/Anti-Lag e impacto de upscaling/FG.",
+    "categoria": "Performance & Input",
+    "status": "Em breve",
+    "slug": "latencia-sistema-reflex-e-frames",
+    "tags": ["Latência", "Frametime", "VRR", "Frame Gen"]
+  },
+  {
+    "id": "11",
+    "titulo": "Periféricos: Polling Rate, Sensores, Switches e Teclados",
+    "resumo": "DPI real, sensores ópticos, debounce, Rapid Trigger/Hall Effect, peso e ergonomia para consistência mecânica.",
+    "categoria": "Periféricos & Ergonomia",
+    "status": "Em breve",
+    "slug": "perifericos-polling-rate-e-sensores",
+    "tags": ["Mouse", "Polling Rate", "Hall Effect", "Periféricos"]
+  },
+  {
+    "id": "12",
+    "titulo": "Monitores e TVs: Painéis, Taxa de Atualização e HDR",
+    "resumo": "IPS, VA, OLED, tempo de resposta real, overdrive/inverse ghosting, VRR e calibração SDR/HDR.",
+    "categoria": "Consoles & Display",
+    "status": "Em breve",
+    "slug": "monitores-painel-hz-e-hdr",
+    "tags": ["Monitor", "OLED", "IPS", "VRR"]
+  },
+  {
+    "id": "13",
+    "titulo": "Rede Gamer: Jitter, Bufferbloat, Packet Loss e DNS",
+    "resumo": "Cabeamento Cat5e/Cat6, Wi-Fi 6/6E, QoS/SQM, NAT, rotas ISP e estabilidade em partidas competitivas.",
+    "categoria": "Rede & Conectividade",
+    "status": "Em breve",
+    "slug": "rede-bufferbloat-jitter-e-rota",
+    "tags": ["Jitter", "Bufferbloat", "Packet Loss", "Rede"]
+  },
+  {
+    "id": "14",
+    "titulo": "Diagnóstico de Instabilidade, Crash e Estresse",
+    "resumo": "Testes de estresse (CPU/GPU/RAM), logs de evento, undervolt/curva de tensão e isolamento de falha.",
+    "categoria": "Diagnóstico & Setup",
+    "status": "Em breve",
+    "slug": "diagnostico-travamentos-bsod-e-estabilidade",
+    "tags": ["Estresse", "Undervolt", "Crash", "Diagnóstico"]
   }
 ]
