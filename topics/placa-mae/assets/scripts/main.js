@@ -468,7 +468,172 @@
     renderQuiz();
     renderReferences();
     initScrollSpy();
+    initMotherboardLab();
   }
 
   document.addEventListener("DOMContentLoaded", init);
+  
+  function initMotherboardLab() {
+    const cpuEl = document.getElementById("lab-cpu-profile");
+    const vrmEl = document.getElementById("lab-vrm-quality");
+    const loadEl = document.getElementById("lab-load");
+    const airEl = document.getElementById("lab-airflow");
+    const vcoreEl = document.getElementById("lab-vcore");
+    const slotsEl = document.getElementById("lab-slots");
+
+    const loadVal = document.getElementById("lab-load-val");
+    const airVal = document.getElementById("lab-airflow-val");
+    const vcoreVal = document.getElementById("lab-vcore-val");
+    const telemetryEl = document.getElementById("lab-telemetry");
+    const diagLogEl = document.getElementById("lab-diag-log");
+
+    const btnPrime = document.getElementById("lab-cmd-prime");
+    const btnEco = document.getElementById("lab-cmd-eco");
+    const btnReset = document.getElementById("lab-cmd-reset");
+
+    const svgVrm = document.getElementById("svg-vrm");
+    const svgVrmTxt = document.getElementById("svg-vrm-txt");
+    const svgCpu = document.getElementById("svg-cpu");
+    const svgCpuClk = document.getElementById("svg-cpu-clk");
+    const svgCpuTmp = document.getElementById("svg-cpu-tmp");
+    const svgPcie = document.getElementById("svg-pcie");
+    const svgPcieTxt = document.getElementById("svg-pcie-txt");
+    const svgM2Txt = document.getElementById("svg-m2-txt");
+    const svgPchTxt = document.getElementById("svg-pch-txt");
+
+    if (!cpuEl || !telemetryEl) return;
+
+    function compute() {
+      const baseTdp = Number(cpuEl.value);
+      const vrmTier = vrmEl.value;
+      const loadPct = Number(loadEl.value) / 100;
+      const airflowPct = Number(airEl.value) / 100;
+      const vcoreOffset = Number(vcoreEl.value);
+      const slotsMode = slotsEl.value;
+
+      const ambientC = Math.round(30 - airflowPct * 11);
+      loadVal.textContent = `${Math.round(loadPct * 100)}%`;
+      airVal.textContent = `${airflowPct >= 0.7 ? "Alto" : airflowPct >= 0.35 ? "Médio" : "Baixo"} (${ambientC}°C)`;
+      vcoreVal.textContent = `${vcoreOffset >= 0 ? "+" : ""}${vcoreOffset.toFixed(2)} V`;
+
+      const vcore = Math.max(0.95, 1.2 + vcoreOffset + loadPct * 0.08);
+      const voltageFactor = Math.pow(vcore / 1.2, 2);
+      const idleFactor = 0.14 + 0.86 * Math.pow(loadPct, 1.15);
+      const packagePowerW = Math.round(baseTdp * idleFactor * voltageFactor);
+
+      // Corrente estimada no Vcore (I = P / V)
+      const vcoreCurrentA = Math.round(packagePowerW / vcore);
+      // Corrente aproximada no barramento 12V EPS (com eficiência ~88%)
+      const eps12vCurrentA = (packagePowerW / (12 * 0.88)).toFixed(1);
+
+      const vrmCap = { basic: 0.65, mid: 1.0, pro: 1.45 }[vrmTier];
+      const coolingGain = 14 * airflowPct + (vrmTier === "pro" ? 9 : vrmTier === "mid" ? 4 : 0);
+      const vrmHeat = (packagePowerW / (95 * vrmCap)) * 56 - coolingGain;
+      const vrmTempC = Math.max(ambientC + 4, Math.round(ambientC + Math.max(4, vrmHeat)));
+
+      const vrmLimitC = vrmTier === "basic" ? 95 : vrmTier === "mid" ? 105 : 112;
+      const vrmThrottling = vrmTempC >= vrmLimitC;
+
+      const cpuTempC = Math.max(
+        ambientC + 6,
+        Math.round(ambientC + 12 + (packagePowerW / Math.max(65, baseTdp)) * 42 - airflowPct * 10)
+      );
+      const cpuThrottling = cpuTempC >= 95;
+
+      const baseClockGhz = baseTdp === 65 ? 4.6 : baseTdp === 105 ? 5.1 : 5.5;
+      const targetClockGhz = baseClockGhz * (0.78 + 0.22 * loadPct + vcoreOffset * 0.5);
+      let effectiveClockGhz = targetClockGhz;
+
+      if (vrmThrottling || cpuThrottling) {
+        const excess = Math.max(
+          vrmThrottling ? (vrmTempC - vrmLimitC) * 0.035 : 0,
+          cpuThrottling ? (cpuTempC - 95) * 0.04 : 0
+        );
+        effectiveClockGhz = Math.max(2.4, targetClockGhz * (1 - Math.min(0.45, excess + 0.12)));
+      }
+
+      const isThrottling = vrmThrottling || cpuThrottling;
+      const gpuBus = slotsMode === "shared" ? "PCIe 4.0 x8 (Compartilhado)" : "PCIe 4.0 x16 (Dedicado)";
+      const m2Bus = slotsMode === "shared" ? "M.2_1 CPU + M.2_2/3 PCH" : "M.2_1 CPU Gen4 x4";
+      const ioState = slotsMode === "shared" ? "SATA 5/6 podem desativar" : "Todos os barramentos livres";
+
+      telemetryEl.innerHTML = `
+        <div class="telemetry-card">
+          <span class="telemetry-label">Corrente Vcore / EPS 12V</span>
+          <span class="telemetry-value ${vcoreCurrentA > 150 ? "is-warn" : ""}">${vcoreCurrentA} A / ${eps12vCurrentA} A</span>
+          <span class="telemetry-sub">Vcore ~${vcore.toFixed(2)}V · ${packagePowerW}W</span>
+        </div>
+        <div class="telemetry-card">
+          <span class="telemetry-label">Temperatura VRM / CPU</span>
+          <span class="telemetry-value ${isThrottling ? "is-warn" : ""}">${vrmTempC}°C / ${cpuTempC}°C</span>
+          <span class="telemetry-sub">Limite VRM: ${vrmLimitC}°C</span>
+        </div>
+        <div class="telemetry-card">
+          <span class="telemetry-label">Clock Efetivo CPU</span>
+          <span class="telemetry-value ${isThrottling ? "is-warn" : ""}">${effectiveClockGhz.toFixed(2)} GHz</span>
+          <span class="telemetry-sub">${isThrottling ? "THROTTLING ATIVO" : "Estável sem queda"}</span>
+        </div>
+        <div class="telemetry-card">
+          <span class="telemetry-label">PCIe GPU &amp; I/O</span>
+          <span class="telemetry-value ${slotsMode === "shared" ? "is-warn" : ""}">${slotsMode === "shared" ? "x8 / Compartilhado" : "x16 Nativo"}</span>
+          <span class="telemetry-sub">${ioState}</span>
+        </div>
+      `;
+
+      svgVrmTxt.textContent = `VRM: ${vrmTempC}°C`;
+      svgCpuClk.textContent = `${effectiveClockGhz.toFixed(2)} GHz`;
+      svgCpuTmp.textContent = `${cpuTempC}°C`;
+      svgPcieTxt.textContent = `GPU: ${gpuBus}`;
+      svgM2Txt.textContent = m2Bus;
+      svgPchTxt.textContent = slotsMode === "shared" ? "CARGA I/O ALTA" : "I/O NORMAL";
+
+      svgVrm.style.stroke = vrmThrottling ? "var(--accent-red)" : "currentColor";
+      svgCpu.style.stroke = isThrottling ? "var(--accent-red)" : "currentColor";
+      svgPcie.style.stroke = slotsMode === "shared" ? "var(--accent-red)" : "currentColor";
+
+      let diagText = "Sistema operando dentro das margens térmicas e elétricas.";
+      if (vrmThrottling) {
+        diagText = `Alerta VRM (${vrmTempC}°C >= ${vrmLimitC}°C): corrente de ${vcoreCurrentA}A aqueceu os estágios de potência e reduziu o clock para ${effectiveClockGhz.toFixed(2)} GHz. Melhore o airflow ou use VRM superior.`;
+      } else if (cpuThrottling) {
+        diagText = `Alerta térmico na CPU (${cpuTempC}°C): clock reduzido para ${effectiveClockGhz.toFixed(2)} GHz para proteger o silício.`;
+      } else if (slotsMode === "shared") {
+        diagText = `Atenção de barramento: com múltiplas unidades M.2/expansão, confira se a GPU cai de x16 para x8 e se portas SATA são desativadas.`;
+      }
+
+      diagLogEl.innerHTML = `<strong>Diagnóstico em tempo real:</strong> ${diagText}`;
+    }
+
+    [cpuEl, vrmEl, loadEl, airEl, vcoreEl, slotsEl].forEach((ctrl) => {
+      ctrl.addEventListener("input", compute);
+      ctrl.addEventListener("change", compute);
+    });
+
+    btnPrime?.addEventListener("click", () => {
+      cpuEl.value = "170";
+      loadEl.value = "100";
+      vcoreEl.value = "0.08";
+      compute();
+    });
+
+    btnEco?.addEventListener("click", () => {
+      cpuEl.value = "105";
+      loadEl.value = "65";
+      vcoreEl.value = "-0.04";
+      airEl.value = "70";
+      compute();
+    });
+
+    btnReset?.addEventListener("click", () => {
+      cpuEl.value = "105";
+      vrmEl.value = "mid";
+      loadEl.value = "85";
+      airEl.value = "50";
+      vcoreEl.value = "0";
+      slotsEl.value = "clean";
+      compute();
+    });
+
+    compute();
+  }
+
 })();
