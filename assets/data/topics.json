@@ -22,7 +22,7 @@
     "titulo": "Memória RAM: Frequência, Latência (CL) e Dual Channel",
     "resumo": "A matemática prática entre MHz e nanosegundos reais, ativação de perfis XMP/EXPO e topologia de slots.",
     "categoria": "Hardware Base",
-    "status": "Em breve",
+    "status": "Publicada",
     "slug": "memoria-ram",
     "tags": ["DDR4", "DDR5", "XMP", "Latência"]
   },
