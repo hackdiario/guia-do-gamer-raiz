@@ -67,8 +67,8 @@
     "titulo": "CPU: IPC, Cache L1/L2/L3 e Escalonamento",
     "resumo": "Como arquitetura, cache e distribuição de threads impactam jogos competitivos e mundos abertos.",
     "categoria": "Hardware Base",
-    "status": "Em breve",
-    "slug": "cpu-cache-ipc-e-agendamento",
+    "status": "Publicada",
+    "slug": "cpu-cache-ipc-escalonamento",
     "tags": ["CPU", "Cache L3", "IPC", "Threads"]
   },
   {

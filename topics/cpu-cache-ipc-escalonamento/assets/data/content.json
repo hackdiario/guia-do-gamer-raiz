@@ -1,0 +1,97 @@
+{
+  "scenarios": {
+    "sim-heavy": {
+      "title": "Jogos com Muita Simulação, Física, IA ou Cidades/Multidão",
+      "detail": "Esses cenários exigem bastante cálculo de estado do mundo, acesso frequente a estruturas de dados e sincronização entre threads. IPC sólido, boa latência de memória e cache suficiente ajudam a manter o frametime mais estável."
+    },
+    "high-hz": {
+      "title": "Busca por 120+ FPS em Resoluções Menores com GPU Folgada",
+      "detail": "Quando a GPU não é o gargalo, cada quadro precisa ser preparado em poucos milissegundos pela CPU. Aqui o desempenho por núcleo, o escalonamento de threads e a resposta de cache ganham destaque."
+    },
+    "multitask": {
+      "title": "Jogo Rodando com Captura de Tela, Navegador ou Outros Processos",
+      "detail": "Processos em segundo plano disputam tempo de CPU e memória. Manter o sistema limpo e evitar cargas pesadas concorrentes ajuda a preservar a estabilidade das mínimas de FPS."
+    }
+  },
+  "xrays": [
+    {
+      "question": "Uma CPU com 16 núcleos sempre entrega o dobro de FPS de uma CPU de 8 núcleos em jogos?",
+      "answer": "Não. Muitos jogos não escalam linearmente além de certos limites de threads e ainda dependem de cadeias de execução que exigem bom desempenho por núcleo e baixa latência."
+    },
+    {
+      "question": "Apenas olhar o número em GHz basta para comparar duas CPUs de gerações diferentes?",
+      "answer": "Não. Se uma arquitetura executa mais trabalho por ciclo (maior IPC) e tem cache mais eficiente, ela pode superar ou igualar um clock maior de geração antiga."
+    },
+    {
+      "question": "Cache L3 é a mesma coisa que memória RAM?",
+      "answer": "Não. Cache L3 fica integrado no processador com latência muito menor e capacidade bem menor que a RAM DDR, atuando como memória intermediária rápida."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "q1",
+      "prompt": "O que significa IPC no contexto de uma CPU?",
+      "options": [
+        "Quantidade média de instruções concluídas por ciclo de clock",
+        "Capacidade total do disco NVMe em gigabytes",
+        "Taxa de atualização do monitor em hertz"
+      ],
+      "correct": 0,
+      "explanation": "IPC (Instructions Per Cycle) mede quanto trabalho útil o núcleo realiza a cada ciclo de clock."
+    },
+    {
+      "id": "q2",
+      "prompt": "Qual é o papel principal da memória cache (L1/L2/L3) em relação à RAM principal?",
+      "options": [
+        "Reduzir o tempo de espera por dados e instruções com menor latência que a RAM",
+        "Substituir permanentemente o armazenamento de arquivos no SSD",
+        "Converter sinal digital em analógico para alto-falantes"
+      ],
+      "correct": 0,
+      "explanation": "A cache armazena dados/instruções acessados com frequência com acesso mais rápido e menor latência que a RAM."
+    },
+    {
+      "id": "q3",
+      "prompt": "Em um cenário focado em altas taxas de quadros com GPU folgada, o que tende a limitar o teto de FPS?",
+      "options": [
+        "O ritmo de preparação de quadros pela CPU (IPC, clock, cache e escalonamento/latência)",
+        "A cor do gabinete do computador",
+        "A taxa de atualização máxima do teclado"
+      ],
+      "correct": 0,
+      "explanation": "Quando a GPU tem folga, a velocidade com que a CPU prepara os quadros e gerencia threads passa a ditar o limite."
+    }
+  ],
+  "references": [
+    {
+      "category": "Arquitetura de Processadores",
+      "items": [
+        {
+          "title": "WikiChip — Microarchitectures & CPU Documentation",
+          "url": "https://en.wikichip.org/wiki/WikiChip",
+          "note": "Referência técnica sobre caches, pipelines, IPC e topologias de núcleos."
+        },
+        {
+          "title": "Gamers Nexus — CPU Benchmarks & Scaling",
+          "url": "https://gamersnexus.net/",
+          "note": "Testes práticos de CPUs em jogos, aplicações e impacto de cache/escalonamento."
+        }
+      ]
+    },
+    {
+      "category": "Análise e Telemetria",
+      "items": [
+        {
+          "title": "HWiNFO64",
+          "url": "https://www.hwinfo.com/",
+          "note": "Monitore clocks efetivos por núcleo, temperaturas, potência e possíveis throttlings."
+        },
+        {
+          "title": "CapFrameX",
+          "url": "https://www.capframex.com/",
+          "note": "Ferramenta para analisar frametimes, percentis baixos e consistência de quadros."
+        }
+      ]
+    }
+  ]
+}
