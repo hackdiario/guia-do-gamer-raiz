@@ -1,0 +1,83 @@
+{
+  "xrays": [
+    {
+      "question": "Qualquer jogo em modo Desempenho roda cravado a 120 FPS?",
+      "answer": "Não. Muitos modos Desempenho miram 60 FPS estáveis; modos de 120 FPS existem em títulos ou situações específicas e costumam reduzir resolução e efeitos visuais."
+    },
+    {
+      "question": "Ter uma TV 4K 60Hz impede ligar um console moderno?",
+      "answer": "Não. O console ajusta a saída para 4K 60Hz (ou 1080p/1440p conforme o caso), mas você não terá 120 Hz nem recursos exclusivos de HDMI 2.1 que dependam do painel."
+    },
+    {
+      "question": "Memória unificada significa memória infinita?",
+      "answer": "Não. O pool é compartilhado entre CPU, GPU e sistema; jogos exigentes ainda precisam gerenciar orçamento de memória para texturas, buffers e assets."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "q1",
+      "prompt": "Qual é a principal vantagem arquitetônica da memória unificada em uma APU de console?",
+      "options": [
+        "CPU e GPU acessam o mesmo pool de memória sem duplicar cópias entre RAM e VRAM separadas",
+        "Elimina completamente a necessidade de armazenamento interno",
+        "Aumenta a taxa de atualização física de qualquer monitor antigo para 240 Hz"
+      ],
+      "correct": 0,
+      "explanation": "O pool unificado permite que CPU e GPU compartilhem dados na mesma memória física, evitando cópias redundantes entre pools separados."
+    },
+    {
+      "id": "q2",
+      "prompt": "Qual recurso ajuda a reduzir screen tearing e suavizar quedas moderadas de taxa de quadros na tela?",
+      "options": [
+        "VRR (Variable Refresh Rate)",
+        "Modo de economia de energia em standby",
+        "Desativar a saída de áudio"
+      ],
+      "correct": 0,
+      "explanation": "O VRR ajusta dinamicamente a atualização do display para acompanhar a entrega de quadros dentro da faixa suportada."
+    },
+    {
+      "id": "q3",
+      "prompt": "Em um jogo com opção entre Fidelidade e Desempenho, qual troca costuma ocorrer no modo Desempenho?",
+      "options": [
+        "Prioriza maior taxa de quadros/fluidez em troca de menor resolução interna ou redução de detalhes/efeitos",
+        "Aumenta o consumo elétrico da TV para dobrar a memória RAM do console",
+        "Desliga o controle sem fio automaticamente"
+      ],
+      "correct": 0,
+      "explanation": "O modo Desempenho reduz carga gráfica (resolução/sombras/RT) para entregar maior taxa de quadros e resposta mais fluida."
+    }
+  ],
+  "references": [
+    {
+      "category": "Padrões de Vídeo e Display",
+      "items": [
+        {
+          "title": "HDMI Licensing Administrator — HDMI 2.1 Overview",
+          "url": "https://www.hdmi.org/spec/hdmi2_1",
+          "note": "Especificações oficiais de largura de banda, VRR e ALLM no HDMI 2.1."
+        },
+        {
+          "title": "VESA — Adaptive-Sync / Display Standards",
+          "url": "https://vesa.org/",
+          "note": "Padrões da indústria de exibição e sincronização adaptativa."
+        }
+      ]
+    },
+    {
+      "category": "Análises Técnicas de Consoles",
+      "items": [
+        {
+          "title": "Digital Foundry — Console & Graphics Tech Analysis",
+          "url": "https://www.eurogamer.net/digitalfoundry",
+          "note": "Análises detalhadas de modos gráficos, resolução, frametime e VRR em consoles."
+        },
+        {
+          "title": "RTINGS — TV & Gaming Display Reviews",
+          "url": "https://www.rtings.com/tv",
+          "note": "Medições técnicas de input lag, VRR, HDMI 2.1 e HDR em televisores."
+        }
+      ]
+    }
+  ]
+}

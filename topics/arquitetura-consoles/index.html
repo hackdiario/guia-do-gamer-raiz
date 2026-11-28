@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>05 — Consoles por Dentro: Arquitetura Unificada e Modos Gráficos | guia-do-gamer-raiz</title>
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('ggr-theme') ||
+        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+  <style>
+    .topic-layout {
+      display: grid;
+      grid-template-columns: 210px 1fr;
+      gap: 2.25rem;
+      align-items: start;
+      padding: 1.25rem 0 3rem;
+    }
+
+    .anchor-nav {
+      position: sticky;
+      top: 1.5rem;
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-surface);
+      padding: 1rem;
+    }
+
+    .anchor-nav-title {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.4rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .anchor-nav ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .anchor-nav a {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      display: block;
+      padding: 0.2rem 0.35rem;
+      border-left: 2px solid transparent;
+      transition: all var(--transition-fast);
+    }
+
+    .anchor-nav a:hover,
+    .anchor-nav a.is-active {
+      color: var(--accent-red);
+      border-left-color: var(--accent-red);
+      background-color: var(--bg-subtle);
+    }
+
+    .topic-main section {
+      margin-bottom: 3rem;
+      scroll-margin-top: 1.5rem;
+    }
+
+    .topic-main h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 0.85rem;
+      padding-bottom: 0.4rem;
+      border-bottom: 1px solid var(--border-strong);
+    }
+
+    .topic-main h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin: 1.35rem 0 0.5rem;
+    }
+
+    .topic-main p {
+      margin-bottom: 0.9rem;
+      color: var(--text-primary);
+    }
+
+    .tech-list {
+      margin: 0.75rem 0 1.25rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .tech-list li {
+      color: var(--text-secondary);
+    }
+
+    .tech-list strong {
+      color: var(--text-primary);
+    }
+
+    .spec-table-wrap {
+      overflow-x: auto;
+      margin: 1.25rem 0;
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-surface);
+    }
+
+    .spec-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+
+    .spec-table th,
+    .spec-table td {
+      padding: 0.7rem 0.85rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+      vertical-align: top;
+    }
+
+    .spec-table th {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background-color: var(--bg-subtle);
+      color: var(--text-primary);
+    }
+
+    .spec-table td {
+      color: var(--text-secondary);
+    }
+
+    .spec-table td strong {
+      color: var(--text-primary);
+    }
+
+    /* Diagrama de Memória Unificada */
+    .diagram-box {
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-surface);
+      padding: 1.25rem;
+      margin: 1.25rem 0;
+    }
+
+    .diagram-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-bottom: 0.85rem;
+    }
+
+    .console-svg {
+      width: 100%;
+      height: auto;
+      display: block;
+      background-color: var(--bg-subtle);
+      border: 1px solid var(--border-color);
+    }
+
+    .pool-flow {
+      stroke: var(--accent-red);
+      stroke-width: 2.3;
+      stroke-dasharray: 6 5;
+      fill: none;
+      animation: poolDash 1.15s linear infinite;
+    }
+
+    .out-flow {
+      stroke: var(--text-primary);
+      stroke-width: 2;
+      stroke-dasharray: 5 5;
+      fill: none;
+      animation: poolDash 1.5s linear infinite;
+    }
+
+    @keyframes poolDash {
+      to {
+        stroke-dashoffset: -22;
+      }
+    }
+
+    /* Simulador de Modos Gráficos, VRR e HDMI 2.1 */
+    .mode-panel {
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-surface);
+      padding: 1.25rem;
+      margin: 1.25rem 0;
+    }
+
+    .mode-controls {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.9rem;
+      margin-bottom: 1rem;
+    }
+
+    .mode-field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .mode-field label {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .mode-field select,
+    .mode-field input[type="range"] {
+      width: 100%;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text-primary);
+      background-color: var(--bg-page);
+      border: 1px solid var(--border-color);
+      padding: 0.45rem;
+    }
+
+    .mode-field input[type="range"] {
+      padding: 0;
+      accent-color: var(--accent-red);
+      cursor: pointer;
+    }
+
+    .mode-presets {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .btn-ghost {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      padding: 0.5rem 0.85rem;
+      background-color: var(--bg-page);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      cursor: pointer;
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--accent-red);
+    }
+
+    .mode-metrics {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.65rem;
+      border-top: 2px solid var(--border-strong);
+      padding-top: 1rem;
+    }
+
+    .metric-card {
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-page);
+      padding: 0.7rem 0.8rem;
+    }
+
+    .metric-label {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      display: block;
+    }
+
+    .metric-val {
+      font-family: var(--font-mono);
+      font-size: 1rem;
+      font-weight: 700;
+      margin-top: 0.2rem;
+      display: block;
+    }
+
+    .metric-sub {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      margin-top: 0.2rem;
+      display: block;
+    }
+
+    .is-warn {
+      color: var(--accent-red);
+    }
+
+    .mode-diag {
+      margin-top: 0.85rem;
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-page);
+      padding: 0.7rem 0.85rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    .mode-diag strong {
+      color: var(--text-primary);
+    }
+
+    /* Checklist de TV / Display para Console */
+    .tv-checklist {
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-surface);
+      padding: 1.25rem;
+      margin: 1.25rem 0;
+    }
+
+    .tv-items {
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+      margin-top: 0.75rem;
+    }
+
+    .tv-check-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+      padding: 0.65rem 0.75rem;
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-page);
+      font-size: 0.88rem;
+      cursor: pointer;
+    }
+
+    .tv-check-row input {
+      margin-top: 0.2rem;
+      accent-color: var(--accent-red);
+      cursor: pointer;
+    }
+
+    .tv-summary {
+      margin-top: 0.85rem;
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      color: var(--text-secondary);
+    }
+
+    /* Raio-X e Quiz */
+    .xray-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin: 1.25rem 0;
+    }
+
+    .xray-card {
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-surface);
+    }
+
+    .xray-trigger {
+      width: 100%;
+      text-align: left;
+      background: none;
+      border: none;
+      color: var(--text-primary);
+      padding: 0.9rem 1rem;
+      font-family: var(--font-sans);
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .xray-trigger:hover {
+      background-color: var(--bg-subtle);
+    }
+
+    .xray-indicator {
+      font-family: var(--font-mono);
+      color: var(--accent-red);
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .xray-body {
+      display: none;
+      padding: 0 1rem 1rem;
+      border-top: 1px solid var(--border-color);
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    .xray-card.is-open .xray-body {
+      display: block;
+      padding-top: 0.85rem;
+    }
+
+    .quiz-box {
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-surface);
+      padding: 1.25rem;
+      margin: 1.25rem 0;
+    }
+
+    .quiz-question {
+      margin-bottom: 1.5rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .quiz-q-title {
+      font-weight: 700;
+      margin-bottom: 0.65rem;
+      font-size: 0.95rem;
+    }
+
+    .quiz-options {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .quiz-option-btn {
+      text-align: left;
+      padding: 0.6rem 0.8rem;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--text-primary);
+      background-color: var(--bg-page);
+      border: 1px solid var(--border-color);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .quiz-option-btn:hover:not(:disabled) {
+      border-color: var(--accent-red);
+    }
+
+    .quiz-option-btn.is-correct {
+      border-color: var(--border-strong);
+      background-color: var(--bg-subtle);
+      font-weight: 700;
+    }
+
+    .quiz-option-btn.is-wrong {
+      border-color: var(--accent-red);
+      color: var(--accent-red);
+    }
+
+    .quiz-feedback {
+      margin-top: 0.6rem;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      padding: 0.6rem 0.75rem;
+      background-color: var(--bg-subtle);
+      border-left: 2px solid var(--accent-red);
+    }
+
+    .btn-primary-red {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 0.65rem 1.1rem;
+      background-color: var(--accent-red);
+      color: var(--text-on-accent);
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-primary-red:hover {
+      background-color: var(--accent-red-hover);
+    }
+
+    .quiz-score {
+      margin-top: 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .ref-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .ref-card {
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-surface);
+      padding: 1rem;
+    }
+
+    .ref-card h3 {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      color: var(--accent-red);
+      margin-bottom: 0.65rem;
+    }
+
+    .ref-card ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+      font-size: 0.85rem;
+    }
+
+    .ref-card a {
+      color: var(--text-primary);
+      font-weight: 600;
+      text-decoration: none;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .ref-card a:hover {
+      color: var(--accent-red);
+      border-bottom-color: var(--accent-red);
+    }
+
+    .ref-card span {
+      display: block;
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      margin-top: 0.15rem;
+    }
+
+    @media (max-width: 820px) {
+      .topic-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .anchor-nav {
+        position: static;
+      }
+
+      .mode-controls,
+      .mode-metrics {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <button id="theme-toggle" class="bookmark-toggle" type="button" aria-label="Alternar tema claro/escuro" title="Alternar tema">
+    <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+    <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+    </svg>
+  </button>
+
+  <div class="container">
+    <nav class="breadcrumb" aria-label="Navegação estrutural">
+      <a href="../../index.html">&larr; Voltar ao Sumário</a>
+      <span>/</span>
+      <span>05. Consoles &amp; Display</span>
+    </nav>
+
+    <header class="editorial-header">
+      <div class="meta-bar">
+        <span>TRILHA: CONSOLES &amp; DISPLAY</span>
+        <span>TÓPICO 05</span>
+      </div>
+      <h1 class="site-title">Consoles por Dentro: Arquitetura Unificada e Modos Gráficos</h1>
+      <p class="site-subtitle">
+        Como funcionam APUs customizadas, memória GDDR6 compartilhada, VRR, HDMI 2.1 e modos Fidelidade vs Desempenho.
+      </p>
+    </header>
+
+    <div class="topic-layout">
+      <aside class="anchor-nav" aria-label="Índice da seção">
+        <div class="anchor-nav-title">Sumário Técnico</div>
+        <ul id="anchor-list">
+          <li><a href="#sec-apu-unificada">1. APU e Memória Unificada</a></li>
+          <li><a href="#sec-vrr-hdmi">2. VRR, ALLM e HDMI 2.1</a></li>
+          <li><a href="#sec-modos">3. Fidelidade vs. Desempenho</a></li>
+          <li><a href="#sec-sim-modos">4. Simulador de Modos &amp; Banda</a></li>
+          <li><a href="#sec-checklist-tv">5. Checklist de TV / Display</a></li>
+          <li><a href="#sec-raiox">6. Mitos vs. Realidade</a></li>
+          <li><a href="#sec-quiz">7. Quiz Prático</a></li>
+          <li><a href="#sec-referencias">8. Referências</a></li>
+        </ul>
+      </aside>
+
+      <main class="topic-main">
+        <section id="sec-apu-unificada">
+          <h2>1. APU Customizada e Memória Unificada</h2>
+          <p>
+            Diferente de um PC montado com CPU, placa de vídeo e memória RAM separadas, consoles domésticos costumam integrar núcleos de CPU e GPU em um único SoC/<strong>APU</strong> (<em>Accelerated Processing Unit</em>) sobre um <strong>pool de memória unificada</strong> (geralmente GDDR6 de alta largura de banda).
+          </p>
+
+          <ul class="tech-list">
+            <li><strong>Vantagem da memória unificada:</strong> Evita copiar os mesmos dados entre RAM e VRAM, reduzindo sobrecarga de cópia e economizando espaço/consumo no projeto.</li>
+            <li><strong>Contrapartida prática:</strong> CPU, GPU e sistema operacional dividem a mesma capacidade total e a mesma largura de banda de memória — texturas em 4K e <em>ray tracing</em> consomem memória e banda que disputam espaço com o restante do jogo.</li>
+          </ul>
+
+          <div class="diagram-box">
+            <div class="diagram-top">
+              <span>DIAGRAMA: APU (CPU + GPU) SOBRE MEMÓRIA UNIFICADA E SAÍDA HDMI 2.1</span>
+              <span>VERMELHO = MEMÓRIA COMPARTILHADA | SÓLIDA = VÍDEO</span>
+            </div>
+            <svg class="console-svg" viewBox="0 0 600 175" role="img" aria-label="Arquitetura de console com APU e memória unificada">
+              <rect x="20" y="22" width="170" height="130" fill="var(--bg-surface)" stroke="currentColor" stroke-width="1.5"></rect>
+              <text x="105" y="45" text-anchor="middle" font-family="monospace" font-size="10" fill="currentColor">APU CUSTOMIZADA</text>
+              <rect x="34" y="58" width="142" height="36" fill="var(--bg-subtle)" stroke="currentColor" stroke-width="1"></rect>
+              <text x="105" y="80" text-anchor="middle" font-family="monospace" font-size="9" fill="currentColor">NÚCLEOS CPU</text>
+              <rect x="34" y="102" width="142" height="38" fill="var(--bg-subtle)" stroke="currentColor" stroke-width="1"></rect>
+              <text x="105" y="125" text-anchor="middle" font-family="monospace" font-size="9" fill="currentColor">NÚCLEOS GPU / RT</text>
+
+              <rect x="245" y="42" width="150" height="90" fill="var(--bg-surface)" stroke="currentColor" stroke-width="1.5"></rect>
+              <text x="320" y="76" text-anchor="middle" font-family="monospace" font-size="10" fill="currentColor">MEMÓRIA</text>
+              <text x="320" y="93" text-anchor="middle" font-family="monospace" font-size="10" fill="currentColor">UNIFICADA</text>
+              <text x="320" y="112" text-anchor="middle" font-family="monospace" font-size="8" fill="currentColor">(Pool Compartilhado)</text>
+
+              <rect x="445" y="42" width="135" height="90" fill="var(--bg-surface)" stroke="currentColor" stroke-width="1.5"></rect>
+              <text x="512" y="78" text-anchor="middle" font-family="monospace" font-size="10" fill="currentColor">HDMI 2.1</text>
+              <text x="512" y="96" text-anchor="middle" font-family="monospace" font-size="8" fill="currentColor">4K / 120Hz / VRR</text>
+
+              <line x1="190" y1="87" x2="245" y2="87" class="pool-flow"></line>
+              <line x1="395" y1="87" x2="445" y2="87" class="out-flow"></line>
+            </svg>
+          </div>
+        </section>
+
+        <section id="sec-vrr-hdmi">
+          <h2>2. VRR, ALLM e Largura de Banda HDMI 2.1</h2>
+          <p>
+            Em jogos com taxa de quadros variável, o <strong>VRR</strong> (<em>Variable Refresh Rate</em>) sincroniza a atualização da tela com a entrega dos quadros, suavizando rasgos de imagem (<em>screen tearing</em>) e reduzindo a sensação de engasgo quando o FPS oscila dentro da janela de VRR do painel.
+          </p>
+
+          <div class="spec-table-wrap">
+            <table class="spec-table">
+              <thead>
+                <tr>
+                  <th>Recurso / Padrão</th>
+                  <th>O Que Faz</th>
+                  <th>Requisito Prático</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>HDMI 2.1 (até 48 Gbps)</strong></td>
+                  <td>Suporta 4K a 120 Hz com HDR/VRR em banda ampla sem compressão severa</td>
+                  <td>Porta HDMI 2.1 na TV/monitor e cabo certificado de ultra alta velocidade</td>
+                </tr>
+                <tr>
+                  <td><strong>VRR</strong></td>
+                  <td>Adapta taxa de atualização da tela ao ritmo de quadros</td>
+                  <td>Suporte nativo no display e faixa de Hz compatível</td>
+                </tr>
+                <tr>
+                  <td><strong>ALLM</strong></td>
+                  <td><em>Auto Low Latency Mode</em> — alterna automaticamente o modo de baixa latência da TV</td>
+                  <td>Evita pós-processamento pesado de imagem que eleva o <em>input lag</em></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="sec-modos">
+          <h2>3. Modos Gráficos: Fidelidade vs. Desempenho vs. Balanceado</h2>
+          <p>
+            Como o hardware do console é fixo, os desenvolvedores oferecem perfis que trocam resolução interna, qualidade de sombras/<em>ray tracing</em> e densidade de detalhes por taxa de quadros e estabilidade de <em>frametime</em>.
+          </p>
+
+          <ul class="tech-list">
+            <li><strong>Modo Fidelidade (Qualidade):</strong> Prioriza resolução mais alta (ou upscaling de base maior) e efeitos visuais mais pesados, geralmente operando em alvos de 30 fps (ou 40 fps em telas de 120 Hz compatíveis).</li>
+            <li><strong>Modo Desempenho:</strong> Prioriza 60 fps (ou mais em modos de alta taxa), reduzindo resolução interna, distância de detalhes ou efeitos pesados para manter fluidez e resposta de controle.</li>
+          </ul>
+        </section>
+
+        <section id="sec-sim-modos">
+          <h2>4. Simulador Interativo de Modos Gráficos e Saída de Vídeo</h2>
+          <p>
+            Selecione o modo gráfico, a resolução/upscaling, a taxa de atualização do display e o ativação de VRR para observar o alvo de FPS, o <em>frametime</em> e a exigência de banda.
+          </p>
+
+          <div class="mode-panel">
+            <div class="mode-controls">
+              <div class="mode-field">
+                <label for="con-mode"><span>Modo Gráfico</span></label>
+                <select id="con-mode">
+                  <option value="fidelity">Fidelidade (Qualidade / RT)</option>
+                  <option value="balanced">Balanceado (40 fps / 120 Hz)</option>
+                  <option value="performance" selected>Desempenho (60+ fps)</option>
+                </select>
+              </div>
+
+              <div class="mode-field">
+                <label for="con-out"><span>Saída de Vídeo</span></label>
+                <select id="con-out">
+                  <option value="4k60">4K @ 60 Hz (HDMI 2.0/2.1)</option>
+                  <option value="4k120" selected>4K @ 120 Hz (HDMI 2.1)</option>
+                  <option value="1080p120">1080p / 1440p @ 120 Hz</option>
+                </select>
+              </div>
+
+              <div class="mode-field">
+                <label for="con-vrr"><span>VRR (Variable Refresh Rate)</span></label>
+                <select id="con-vrr">
+                  <option value="on" selected>Ativado</option>
+                  <option value="off">Desativado</option>
+                </select>
+              </div>
+
+              <div class="mode-field">
+                <label for="con-scene">
+                  <span>Peso da Cena</span>
+                  <span id="con-scene-val">Médio</span>
+                </label>
+                <input id="con-scene" type="range" min="1" max="3" step="1" value="2">
+              </div>
+            </div>
+
+            <div class="mode-presets">
+              <button type="button" class="btn-primary-red" id="con-cmd-perf">Perfil: Competitivo / 60+ FPS</button>
+              <button type="button" class="btn-ghost" id="con-cmd-fid">Perfil: Cinematográfico / Fidelidade</button>
+              <button type="button" class="btn-ghost" id="con-cmd-reset">Resetar</button>
+            </div>
+
+            <div id="con-metrics" class="mode-metrics" aria-live="polite"></div>
+            <div id="con-diag" class="mode-diag" aria-live="polite"></div>
+          </div>
+        </section>
+
+        <section id="sec-checklist-tv">
+          <h2>5. Checklist Prático de Configuração da TV / Monitor</h2>
+          <p>Marque os itens verificados na configuração do console e da tela:</p>
+
+          <div class="tv-checklist" id="tv-checklist">
+            <label class="tv-check-row">
+              <input type="checkbox" data-tv-check checked>
+              <span><strong>Modo Jogo / ALLM ativo:</strong> evita processamento extra de imagem que aumenta o atraso no controle.</span>
+            </label>
+            <label class="tv-check-row">
+              <input type="checkbox" data-tv-check checked>
+              <span><strong>Entrada HDMI 2.1 configurada:</strong> algumas TVs exigem habilitar "Formato de sinal aprimorado / 4K 120Hz" na porta específica.</span>
+            </label>
+            <label class="tv-check-row">
+              <input type="checkbox" data-tv-check>
+              <span><strong>VRR habilitado no sistema e na tela:</strong> reduz tearing e suaviza oscilações moderadas de FPS.</span>
+            </label>
+            <label class="tv-check-row">
+              <input type="checkbox" data-tv-check>
+              <span><strong>Calibração HDR / nível de preto revisada:</strong> evita lavagem de cores ou perda de detalhes nas sombras.</span>
+            </label>
+            <div id="tv-summary" class="tv-summary" aria-live="polite"></div>
+          </div>
+        </section>
+
+        <section id="sec-raiox">
+          <h2>6. Mitos vs. Realidade em Consoles</h2>
+          <div id="xray-container" class="xray-list"></div>
+        </section>
+
+        <section id="sec-quiz">
+          <h2>7. Quiz Prático</h2>
+          <div id="quiz-container" class="quiz-box"></div>
+        </section>
+
+        <section id="sec-referencias">
+          <h2>8. Referências Técnicas &amp; Aprofundamento</h2>
+          <div id="references-container" class="ref-grid"></div>
+        </section>
+      </main>
+    </div>
+
+    <footer class="editorial-footer">
+      <p>Desenvolvido por hackdiario para fins de Aprendizado Prático e Interativo. &copy; 2026 — Todos os direitos reservados.</p>
+    </footer>
+  </div>
+
+  <script src="./assets/scripts/main.js"></script>
+</body>
+</html>
