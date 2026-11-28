@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>02 — Fontes de Alimentação (PSU): Eficiência e Trilhos | guia-do-gamer-raiz</title>
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('ggr-theme') ||
+        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+  <style>
+    .topic-layout {
+      display: grid;
+      grid-template-columns: 210px 1fr;
+      gap: 2.25rem;
+      align-items: start;
+      padding: 1.25rem 0 3rem;
+    }
+
+    .anchor-nav {
+      position: sticky;
+      top: 1.5rem;
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-surface);
+      padding: 1rem;
+    }
+
+    .anchor-nav-title {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.4rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .anchor-nav ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .anchor-nav a {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      display: block;
+      padding: 0.2rem 0.35rem;
+      border-left: 2px solid transparent;
+      transition: all var(--transition-fast);
+    }
+
+    .anchor-nav a:hover,
+    .anchor-nav a.is-active {
+      color: var(--accent-red);
+      border-left-color: var(--accent-red);
+      background-color: var(--bg-subtle);
+    }
+
+    .topic-main section {
+      margin-bottom: 3rem;
+      scroll-margin-top: 1.5rem;
+    }
+
+    .topic-main h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 0.85rem;
+      padding-bottom: 0.4rem;
+      border-bottom: 1px solid var(--border-strong);
+    }
+
+    .topic-main h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin: 1.35rem 0 0.5rem;
+    }
+
+    .topic-main p {
+      margin-bottom: 0.9rem;
+      color: var(--text-primary);
+    }
+
+    .tech-list {
+      margin: 0.75rem 0 1.25rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .tech-list li {
+      color: var(--text-secondary);
+    }
+
+    .tech-list strong {
+      color: var(--text-primary);
+    }
+
+    .spec-table-wrap {
+      overflow-x: auto;
+      margin: 1.25rem 0;
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-surface);
+    }
+
+    .spec-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+
+    .spec-table th,
+    .spec-table td {
+      padding: 0.7rem 0.85rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+      vertical-align: top;
+    }
+
+    .spec-table th {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background-color: var(--bg-subtle);
+      color: var(--text-primary);
+    }
+
+    .spec-table td {
+      color: var(--text-secondary);
+    }
+
+    .spec-table td strong {
+      color: var(--text-primary);
+    }
+
+    .psu-panel {
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-surface);
+      padding: 1.25rem;
+      margin: 1.25rem 0;
+    }
+
+    .psu-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 1.25rem;
+      align-items: start;
+    }
+
+    .psu-controls {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.9rem;
+      margin-bottom: 1rem;
+    }
+
+    .psu-control {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .psu-control label {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .psu-control select,
+    .psu-control input[type="range"] {
+      width: 100%;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text-primary);
+      background-color: var(--bg-page);
+      border: 1px solid var(--border-color);
+      padding: 0.45rem;
+    }
+
+    .psu-control input[type="range"] {
+      padding: 0;
+      accent-color: var(--accent-red);
+      cursor: pointer;
+    }
+
+    .psu-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .btn-ghost {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      padding: 0.5rem 0.85rem;
+      background-color: var(--bg-page);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      cursor: pointer;
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--accent-red);
+    }
+
+    .psu-telemetry {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.65rem;
+      border-top: 2px solid var(--border-strong);
+      padding-top: 1rem;
+    }
+
+    .telemetry-card {
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-page);
+      padding: 0.65rem 0.75rem;
+    }
+
+    .telemetry-label {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      display: block;
+    }
+
+    .telemetry-value {
+      font-family: var(--font-mono);
+      font-size: 1rem;
+      font-weight: 700;
+      margin-top: 0.15rem;
+      display: block;
+    }
+
+    .telemetry-sub {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      margin-top: 0.15rem;
+      display: block;
+    }
+
+    .is-warn {
+      color: var(--accent-red);
+    }
+
+    .psu-svg {
+      width: 100%;
+      height: auto;
+      display: block;
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-subtle);
+    }
+
+    .psu-flow-12v {
+      stroke: var(--accent-red);
+      stroke-width: 2.2;
+      stroke-dasharray: 6 6;
+      fill: none;
+      animation: psuDash 1.2s linear infinite;
+    }
+
+    @keyframes psuDash {
+      to {
+        stroke-dashoffset: -24;
+      }
+    }
+
+    .psu-log {
+      margin-top: 0.85rem;
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-page);
+      padding: 0.7rem 0.85rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    .psu-log strong {
+      color: var(--text-primary);
+    }
+
+    .xray-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin: 1.25rem 0;
+    }
+
+    .xray-card {
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-surface);
+    }
+
+    .xray-trigger {
+      width: 100%;
+      text-align: left;
+      background: none;
+      border: none;
+      color: var(--text-primary);
+      padding: 0.9rem 1rem;
+      font-family: var(--font-sans);
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .xray-trigger:hover {
+      background-color: var(--bg-subtle);
+    }
+
+    .xray-indicator {
+      font-family: var(--font-mono);
+      color: var(--accent-red);
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .xray-body {
+      display: none;
+      padding: 0 1rem 1rem;
+      border-top: 1px solid var(--border-color);
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    .xray-card.is-open .xray-body {
+      display: block;
+      padding-top: 0.85rem;
+    }
+
+    .quiz-box {
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-surface);
+      padding: 1.25rem;
+      margin: 1.25rem 0;
+    }
+
+    .quiz-question {
+      margin-bottom: 1.5rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .quiz-q-title {
+      font-weight: 700;
+      margin-bottom: 0.65rem;
+      font-size: 0.95rem;
+    }
+
+    .quiz-options {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .quiz-option-btn {
+      text-align: left;
+      padding: 0.6rem 0.8rem;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--text-primary);
+      background-color: var(--bg-page);
+      border: 1px solid var(--border-color);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .quiz-option-btn:hover:not(:disabled) {
+      border-color: var(--accent-red);
+    }
+
+    .quiz-option-btn.is-correct {
+      border-color: var(--border-strong);
+      background-color: var(--bg-subtle);
+      font-weight: 700;
+    }
+
+    .quiz-option-btn.is-wrong {
+      border-color: var(--accent-red);
+      color: var(--accent-red);
+    }
+
+    .quiz-feedback {
+      margin-top: 0.6rem;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      padding: 0.6rem 0.75rem;
+      background-color: var(--bg-subtle);
+      border-left: 2px solid var(--accent-red);
+    }
+
+    .btn-primary-red {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 0.65rem 1.1rem;
+      background-color: var(--accent-red);
+      color: var(--text-on-accent);
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-primary-red:hover {
+      background-color: var(--accent-red-hover);
+    }
+
+    .quiz-score {
+      margin-top: 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .ref-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .ref-card {
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-surface);
+      padding: 1rem;
+    }
+
+    .ref-card h3 {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      color: var(--accent-red);
+      margin-bottom: 0.65rem;
+    }
+
+    .ref-card ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+      font-size: 0.85rem;
+    }
+
+    .ref-card a {
+      color: var(--text-primary);
+      font-weight: 600;
+      text-decoration: none;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .ref-card a:hover {
+      color: var(--accent-red);
+      border-bottom-color: var(--accent-red);
+    }
+
+    .ref-card span {
+      display: block;
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      margin-top: 0.15rem;
+    }
+
+    @media (max-width: 820px) {
+      .topic-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .anchor-nav {
+        position: static;
+      }
+
+      .psu-grid,
+      .psu-controls,
+      .psu-telemetry {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <button id="theme-toggle" class="bookmark-toggle" type="button" aria-label="Alternar tema claro/escuro" title="Alternar tema">
+    <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+    <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+    </svg>
+  </button>
+
+  <div class="container">
+    <nav class="breadcrumb" aria-label="Navegação estrutural">
+      <a href="../../index.html">← Voltar ao Sumário</a>
+      <span>/</span>
+      <span>02. Energia & Refrigeração</span>
+    </nav>
+
+    <header class="editorial-header">
+      <div class="meta-bar">
+        <span>TRILHA: ENERGIA & REFRIGERAÇÃO</span>
+        <span>TÓPICO 02</span>
+      </div>
+      <h1 class="site-title">Fontes de Alimentação (PSU): Eficiência e Trilhos</h1>
+      <p class="site-subtitle">
+        Como dimensionar potência real, interpretar certificações 80 Plus, ATX 3.0 e evitar fontes bomba.
+      </p>
+    </header>
+
+    <div class="topic-layout">
+      <aside class="anchor-nav" aria-label="Índice da seção">
+        <div class="anchor-nav-title">Sumário Técnico</div>
+        <ul id="anchor-list">
+          <li><a href="#sec-trilhos">1. Trilhos e Potência Real</a></li>
+          <li><a href="#sec-eficiencia">2. Eficiência e 80 Plus</a></li>
+          <li><a href="#sec-atx3">3. ATX 3.0 / 3.1 e Transientes</a></li>
+          <li><a href="#sec-protecoes">4. Proteções e Fontes Bomba</a></li>
+          <li><a href="#sec-lab-psu">5. Simulador de Carga PSU</a></li>
+          <li><a href="#sec-raiox">6. Mitos vs. Realidade</a></li>
+          <li><a href="#sec-quiz">7. Quiz Prático</a></li>
+          <li><a href="#sec-referencias">8. Referências</a></li>
+        </ul>
+      </aside>
+
+      <main class="topic-main">
+        <section id="sec-trilhos">
+          <h2>1. Trilhos de Tensão e Potência Real</h2>
+          <p>
+            A fonte de alimentação (PSU) converte a rede AC (110V/220V) em tensões DC reguladas para os componentes do PC. Em setups modernos, o <strong>trilho de +12V</strong> concentra a maior parte da potência: ele alimenta CPU (via EPS 4+4 pin), GPU (via PCIe 6+2 pin ou 12V-2x6) e os VRMs da placa-mãe.
+          </p>
+
+          <div class="spec-table-wrap">
+            <table class="spec-table">
+              <thead>
+                <tr>
+                  <th>Trilho DC</th>
+                  <th>Destinos Principais</th>
+                  <th>O Que Observar</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>+12V</strong></td>
+                  <td>CPU, GPU, VRM, fans/bombas</td>
+                  <td>Deve entregar quase toda a potência nominal da fonte (ex.: 750W em +12V numa fonte de 750W)</td>
+                </tr>
+                <tr>
+                  <td><strong>+5V</strong></td>
+                  <td>SSDs SATA, periféricos USB, circuitos auxiliares</td>
+                  <td>Regulação estável sob cargas variadas</td>
+                </tr>
+                <tr>
+                  <td><strong>+3.3V</strong></td>
+                  <td>Módulos M.2, slots de expansão, lógica</td>
+                  <td>Conversão DC-DC dedicada evita queda em cargas baixas/mistas</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <ul class="tech-list">
+            <li><strong>Potência nominal vs. útil:</strong> Uma fonte rotulada como "600W" pode entregar apenas 450W–480W reais no +12V se o projeto for antigo ou mal dimensionado.</li>
+            <li><strong>Margem de trabalho:</strong> Operar constantemente perto de 90–100% da capacidade eleva calor, ruído da ventoinha e estresse térmico nos capacitores.</li>
+          </ul>
+        </section>
+
+        <section id="sec-eficiencia">
+          <h2>2. Eficiência Energética e Certificações</h2>
+          <p>
+            <strong>Eficiência</strong> é a razão entre a potência DC entregue aos componentes e a potência AC puxada da tomada. A diferença vira calor dissipado dentro da fonte.
+          </p>
+          <p>
+            <strong>Atenção crítica:</strong> Selos como <em>80 Plus</em> (White, Bronze, Gold, Platinum, Titanium) medem eficiência em pontos de carga específicos — <strong>não</strong> substituem testes de regulação de tensão, ripple (ondulação residual), proteções elétricas e qualidade de componentes internos.
+          </p>
+        </section>
+
+        <section id="sec-atx3">
+          <h2>3. ATX 3.0 / 3.1, Picos Transientes e 12VHPWR / 12V-2x6</h2>
+          <p>
+            GPUs de alto desempenho apresentam <strong>picos transientes</strong> (<em>transient spikes</em>) de curta duração que podem superar 2x o TDP nominal por frações de milissegundos, derrubando fontes antigas por atuação indevida de OCP/OPP.
+          </p>
+
+          <ul class="tech-list">
+            <li><strong>Excursão de pico ATX 3.x:</strong> Especifica tolerância a picos transientes elevados (por exemplo, até 200% da potência nominal da fonte em janelas curtas).</li>
+            <li><strong>Conector 12VHPWR / 12V-2x6:</strong> Encaixe de alta densidade para GPUs modernas. Deve estar inserido até o fim, sem dobra forçada próxima ao conector, evitando mau contato e superaquecimento nos terminais.</li>
+          </ul>
+        </section>
+
+        <section id="sec-protecoes">
+          <h2>4. Proteções Elétricas e Como Evitar "Fontes Bomba"</h2>
+          <p>
+            Fontes confiáveis implementam circuitos de proteção para evitar danos ao hardware em curtos, sobrecargas ou surtos:
+          </p>
+
+          <ul class="tech-list">
+            <li><strong>OPP / OCP:</strong> Proteção contra sobrecarga de potência (<em>Over Power</em>) e sobrecorrente por trilho (<em>Over Current</em>).</li>
+            <li><strong>OVP / UVP:</strong> Proteção contra sobretensão (<em>Over Voltage</em>) e subtensão (<em>Under Voltage</em>).</li>
+            <li><strong>SCP / OTP:</strong> Proteção contra curto-circuito (<em>Short Circuit</em>) e sobretemperatura (<em>Over Temperature</em>).</li>
+            <li><strong>Sinais de fonte bomba:</strong> Ausência de proteções básicas, chave seletora vermelha obsoleta (115V/230V), cabos finos/mal crimpados, promessa de potência irreal e histórico de falhas em bancada.</li>
+          </ul>
+        </section>
+
+        <section id="sec-lab-psu">
+          <h2>5. Simulador Interativo de Carga e Eficiência da PSU</h2>
+          <p>
+            Ajuste potência nominal, certificação/eficiência, consumo da CPU e GPU, picos transientes e temperatura ambiente para acompanhar potência DC/AC, corrente no +12V, margem de carga e calor dissipado.
+          </p>
+
+          <div id="psu-sim" class="psu-panel">
+            <div class="psu-grid">
+              <div>
+                <div class="psu-controls">
+                  <div class="psu-control">
+                    <label for="psu-watts"><span>Potência Nominal</span></label>
+                    <select id="psu-watts">
+                      <option value="550">550W</option>
+                      <option value="650">650W</option>
+                      <option value="750" selected>750W</option>
+                      <option value="850">850W</option>
+                      <option value="1000">1000W</option>
+                    </select>
+                  </div>
+
+                  <div class="psu-control">
+                    <label for="psu-tier"><span>Nível / Eficiência</span></label>
+                    <select id="psu-tier">
+                      <option value="bomba">Genérica / Sem selo (~76%)</option>
+                      <option value="bronze">80 Plus Bronze (~85%)</option>
+                      <option value="gold" selected>80 Plus Gold / ATX 3.x (~90%)</option>
+                      <option value="platinum">Platinum / ATX 3.x (~92%)</option>
+                    </select>
+                  </div>
+
+                  <div class="psu-control">
+                    <label for="psu-gpu-w">
+                      <span>Consumo GPU (TDP)</span>
+                      <span id="psu-gpu-val">260 W</span>
+                    </label>
+                    <input id="psu-gpu-w" type="range" min="60" max="550" step="10" value="260">
+                  </div>
+
+                  <div class="psu-control">
+                    <label for="psu-cpu-w">
+                      <span>Consumo CPU + Sistema</span>
+                      <span id="psu-cpu-val">155 W</span>
+                    </label>
+                    <input id="psu-cpu-w" type="range" min="60" max="320" step="5" value="155">
+                  </div>
+
+                  <div class="psu-control">
+                    <label for="psu-spike">
+                      <span>Pico Transiente GPU</span>
+                      <span id="psu-spike-val">1.4x</span>
+                    </label>
+                    <input id="psu-spike" type="range" min="1.0" max="2.2" step="0.1" value="1.4">
+                  </div>
+
+                  <div class="psu-control">
+                    <label for="psu-amb">
+                      <span>Temp. Ambiente</span>
+                      <span id="psu-amb-val">25°C</span>
+                    </label>
+                    <input id="psu-amb" type="range" min="18" max="38" step="1" value="25">
+                  </div>
+                </div>
+
+                <div class="psu-actions">
+                  <button type="button" id="psu-cmd-heavy" class="btn-primary-red">Comando: GPU High-End + Pico</button>
+                  <button type="button" id="psu-cmd-mid" class="btn-ghost">Comando: Setup 1080p/1440p</button>
+                  <button type="button" id="psu-cmd-reset" class="btn-ghost">Resetar</button>
+                </div>
+
+                <div id="psu-telemetry" class="psu-telemetry" aria-live="polite"></div>
+              </div>
+
+              <div>
+                <svg class="psu-svg" viewBox="0 0 360 230" role="img" aria-label="Diagrama de potência AC para DC e trilho 12V">
+                  <rect x="14" y="20" width="90" height="58" fill="var(--bg-surface)" stroke="currentColor" stroke-width="1.5"></rect>
+                  <text x="59" y="45" text-anchor="middle" font-family="monospace" font-size="9" fill="currentColor">REDE AC</text>
+                  <text id="svg-ac-w" x="59" y="63" text-anchor="middle" font-family="monospace" font-size="9" fill="currentColor">-- W</text>
+
+                  <rect id="svg-psu-box" x="132" y="20" width="102" height="58" fill="var(--bg-surface)" stroke="currentColor" stroke-width="1.5"></rect>
+                  <text x="183" y="44" text-anchor="middle" font-family="monospace" font-size="9" fill="currentColor">PSU +12V</text>
+                  <text id="svg-12v-a" x="183" y="62" text-anchor="middle" font-family="monospace" font-size="9" fill="currentColor">-- A</text>
+
+                  <rect x="262" y="16" width="84" height="42" fill="var(--bg-surface)" stroke="currentColor" stroke-width="1.5"></rect>
+                  <text x="304" y="34" text-anchor="middle" font-family="monospace" font-size="8" fill="currentColor">GPU</text>
+                  <text id="svg-gpu-load" x="304" y="48" text-anchor="middle" font-family="monospace" font-size="8" fill="currentColor">-- W</text>
+
+                  <rect x="262" y="68" width="84" height="42" fill="var(--bg-surface)" stroke="currentColor" stroke-width="1.5"></rect>
+                  <text x="304" y="86" text-anchor="middle" font-family="monospace" font-size="8" fill="currentColor">CPU / M.2</text>
+                  <text id="svg-cpu-load" x="304" y="100" text-anchor="middle" font-family="monospace" font-size="8" fill="currentColor">-- W</text>
+
+                  <rect x="132" y="132" width="214" height="72" fill="var(--bg-surface)" stroke="currentColor" stroke-width="1.5"></rect>
+                  <text x="239" y="154" text-anchor="middle" font-family="monospace" font-size="9" fill="currentColor">TELEMETRIA TÉRMICA & PICO</text>
+                  <text id="svg-heat-w" x="239" y="174" text-anchor="middle" font-family="monospace" font-size="9" fill="currentColor">Calor dissipado: -- W</text>
+                  <text id="svg-peak-w" x="239" y="192" text-anchor="middle" font-family="monospace" font-size="9" fill="currentColor">Pico transiente: -- W</text>
+
+                  <line x1="104" y1="49" x2="132" y2="49" class="psu-flow-12v"></line>
+                  <line x1="234" y1="37" x2="262" y2="37" class="psu-flow-12v"></line>
+                  <line x1="234" y1="62" x2="262" y2="89" class="psu-flow-12v"></line>
+                </svg>
+
+                <div id="psu-diag-log" class="psu-log" aria-live="polite"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="sec-raiox">
+          <h2>6. Mitos vs. Realidade em Fontes de Alimentação</h2>
+          <div id="xray-container" class="xray-list"></div>
+        </section>
+
+        <section id="sec-quiz">
+          <h2>7. Quiz Prático</h2>
+          <div id="quiz-container" class="quiz-box"></div>
+        </section>
+
+        <section id="sec-referencias">
+          <h2>8. Referências Técnicas & Aprofundamento</h2>
+          <div id="references-container" class="ref-grid"></div>
+        </section>
+      </main>
+    </div>
+
+    <footer class="editorial-footer">
+      <p>Desenvolvido por hackdiario para fins de Aprendizado Prático e Interativo. © 2026 — Todos os direitos reservados.</p>
+    </footer>
+  </div>
+
+  <script src="./assets/scripts/main.js"></script>
+</body>
+</html>
