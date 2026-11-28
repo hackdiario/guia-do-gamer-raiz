@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>04 — Armazenamento NVMe, SATA e Controladoras DRAM | guia-do-gamer-raiz</title>
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('ggr-theme') ||
+        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+  <style>
+    .topic-layout {
+      display: grid;
+      grid-template-columns: 210px 1fr;
+      gap: 2.25rem;
+      align-items: start;
+      padding: 1.25rem 0 3rem;
+    }
+
+    .anchor-nav {
+      position: sticky;
+      top: 1.5rem;
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-surface);
+      padding: 1rem;
+    }
+
+    .anchor-nav-title {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.4rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .anchor-nav ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .anchor-nav a {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      display: block;
+      padding: 0.2rem 0.35rem;
+      border-left: 2px solid transparent;
+      transition: all var(--transition-fast);
+    }
+
+    .anchor-nav a:hover,
+    .anchor-nav a.is-active {
+      color: var(--accent-red);
+      border-left-color: var(--accent-red);
+      background-color: var(--bg-subtle);
+    }
+
+    .topic-main section {
+      margin-bottom: 3rem;
+      scroll-margin-top: 1.5rem;
+    }
+
+    .topic-main h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 0.85rem;
+      padding-bottom: 0.4rem;
+      border-bottom: 1px solid var(--border-strong);
+    }
+
+    .topic-main h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin: 1.35rem 0 0.5rem;
+    }
+
+    .topic-main p {
+      margin-bottom: 0.9rem;
+      color: var(--text-primary);
+    }
+
+    .tech-list {
+      margin: 0.75rem 0 1.25rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .tech-list li {
+      color: var(--text-secondary);
+    }
+
+    .tech-list strong {
+      color: var(--text-primary);
+    }
+
+    .spec-table-wrap {
+      overflow-x: auto;
+      margin: 1.25rem 0;
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-surface);
+    }
+
+    .spec-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+
+    .spec-table th,
+    .spec-table td {
+      padding: 0.7rem 0.85rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+      vertical-align: top;
+    }
+
+    .spec-table th {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background-color: var(--bg-subtle);
+      color: var(--text-primary);
+    }
+
+    .spec-table td {
+      color: var(--text-secondary);
+    }
+
+    .spec-table td strong {
+      color: var(--text-primary);
+    }
+
+    /* Diagrama de Caminhos de Armazenamento */
+    .diagram-box {
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-surface);
+      padding: 1.25rem;
+      margin: 1.25rem 0;
+    }
+
+    .diagram-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-bottom: 0.85rem;
+    }
+
+    .storage-svg {
+      width: 100%;
+      height: auto;
+      display: block;
+      background-color: var(--bg-subtle);
+      border: 1px solid var(--border-color);
+    }
+
+    .lane-nvme {
+      stroke: var(--accent-red);
+      stroke-width: 2.4;
+      stroke-dasharray: 7 5;
+      fill: none;
+      animation: nvmePulse 1s linear infinite;
+    }
+
+    .lane-sata {
+      stroke: var(--text-primary);
+      stroke-width: 1.8;
+      stroke-dasharray: 5 5;
+      fill: none;
+      animation: nvmePulse 1.8s linear infinite;
+    }
+
+    @keyframes nvmePulse {
+      to {
+        stroke-dashoffset: -24;
+      }
+    }
+
+    /* Simulador de SSD e Carga em Jogos */
+    .ssd-panel {
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-surface);
+      padding: 1.25rem;
+      margin: 1.25rem 0;
+    }
+
+    .ssd-controls {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.9rem;
+      margin-bottom: 1rem;
+    }
+
+    .ssd-field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .ssd-field label {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .ssd-field select,
+    .ssd-field input[type="range"] {
+      width: 100%;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text-primary);
+      background-color: var(--bg-page);
+      border: 1px solid var(--border-color);
+      padding: 0.45rem;
+    }
+
+    .ssd-field input[type="range"] {
+      padding: 0;
+      accent-color: var(--accent-red);
+      cursor: pointer;
+    }
+
+    .ssd-presets {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .btn-ghost {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      padding: 0.5rem 0.85rem;
+      background-color: var(--bg-page);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      cursor: pointer;
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--accent-red);
+    }
+
+    .ssd-metrics {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.65rem;
+      border-top: 2px solid var(--border-strong);
+      padding-top: 1rem;
+    }
+
+    .metric-card {
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-page);
+      padding: 0.7rem 0.8rem;
+    }
+
+    .metric-label {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      display: block;
+    }
+
+    .metric-val {
+      font-family: var(--font-mono);
+      font-size: 1rem;
+      font-weight: 700;
+      margin-top: 0.2rem;
+      display: block;
+    }
+
+    .metric-sub {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      margin-top: 0.2rem;
+      display: block;
+    }
+
+    .is-warn {
+      color: var(--accent-red);
+    }
+
+    .ssd-diag {
+      margin-top: 0.85rem;
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-page);
+      padding: 0.7rem 0.85rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    .ssd-diag strong {
+      color: var(--text-primary);
+    }
+
+    /* Matriz de Escolha Rápida */
+    .matrix-box {
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-surface);
+      padding: 1.25rem;
+      margin: 1.25rem 0;
+    }
+
+    .matrix-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      margin-bottom: 1rem;
+    }
+
+    .matrix-tab {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      padding: 0.45rem 0.8rem;
+      background-color: var(--bg-page);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-color);
+      cursor: pointer;
+    }
+
+    .matrix-tab.is-active {
+      background-color: var(--accent-red);
+      border-color: var(--accent-red);
+      color: var(--text-on-accent);
+      font-weight: 600;
+    }
+
+    .matrix-output {
+      border-top: 1px solid var(--border-color);
+      padding-top: 0.85rem;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    .matrix-output strong {
+      color: var(--text-primary);
+    }
+
+    /* Raio-X e Quiz */
+    .xray-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin: 1.25rem 0;
+    }
+
+    .xray-card {
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-surface);
+    }
+
+    .xray-trigger {
+      width: 100%;
+      text-align: left;
+      background: none;
+      border: none;
+      color: var(--text-primary);
+      padding: 0.9rem 1rem;
+      font-family: var(--font-sans);
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .xray-trigger:hover {
+      background-color: var(--bg-subtle);
+    }
+
+    .xray-indicator {
+      font-family: var(--font-mono);
+      color: var(--accent-red);
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .xray-body {
+      display: none;
+      padding: 0 1rem 1rem;
+      border-top: 1px solid var(--border-color);
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    .xray-card.is-open .xray-body {
+      display: block;
+      padding-top: 0.85rem;
+    }
+
+    .quiz-box {
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-surface);
+      padding: 1.25rem;
+      margin: 1.25rem 0;
+    }
+
+    .quiz-question {
+      margin-bottom: 1.5rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .quiz-q-title {
+      font-weight: 700;
+      margin-bottom: 0.65rem;
+      font-size: 0.95rem;
+    }
+
+    .quiz-options {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .quiz-option-btn {
+      text-align: left;
+      padding: 0.6rem 0.8rem;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--text-primary);
+      background-color: var(--bg-page);
+      border: 1px solid var(--border-color);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .quiz-option-btn:hover:not(:disabled) {
+      border-color: var(--accent-red);
+    }
+
+    .quiz-option-btn.is-correct {
+      border-color: var(--border-strong);
+      background-color: var(--bg-subtle);
+      font-weight: 700;
+    }
+
+    .quiz-option-btn.is-wrong {
+      border-color: var(--accent-red);
+      color: var(--accent-red);
+    }
+
+    .quiz-feedback {
+      margin-top: 0.6rem;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      padding: 0.6rem 0.75rem;
+      background-color: var(--bg-subtle);
+      border-left: 2px solid var(--accent-red);
+    }
+
+    .btn-primary-red {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 0.65rem 1.1rem;
+      background-color: var(--accent-red);
+      color: var(--text-on-accent);
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-primary-red:hover {
+      background-color: var(--accent-red-hover);
+    }
+
+    .quiz-score {
+      margin-top: 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .ref-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .ref-card {
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-surface);
+      padding: 1rem;
+    }
+
+    .ref-card h3 {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      color: var(--accent-red);
+      margin-bottom: 0.65rem;
+    }
+
+    .ref-card ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+      font-size: 0.85rem;
+    }
+
+    .ref-card a {
+      color: var(--text-primary);
+      font-weight: 600;
+      text-decoration: none;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .ref-card a:hover {
+      color: var(--accent-red);
+      border-bottom-color: var(--accent-red);
+    }
+
+    .ref-card span {
+      display: block;
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      margin-top: 0.15rem;
+    }
+
+    @media (max-width: 820px) {
+      .topic-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .anchor-nav {
+        position: static;
+      }
+
+      .ssd-controls,
+      .ssd-metrics {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <button id="theme-toggle" class="bookmark-toggle" type="button" aria-label="Alternar tema claro/escuro" title="Alternar tema">
+    <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+    <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+    </svg>
+  </button>
+
+  <div class="container">
+    <nav class="breadcrumb" aria-label="Navegação estrutural">
+      <a href="../../index.html">&larr; Voltar ao Sumário</a>
+      <span>/</span>
+      <span>04. Armazenamento</span>
+    </nav>
+
+    <header class="editorial-header">
+      <div class="meta-bar">
+        <span>TRILHA: ARMAZENAMENTO</span>
+        <span>TÓPICO 04</span>
+      </div>
+      <h1 class="site-title">Armazenamento NVMe, SATA e Controladoras DRAM</h1>
+      <p class="site-subtitle">
+        Diferenças reais entre gerações PCIe Gen3/4/5, cache DRAM vs HMB e impacto direto em tempos de carregamento.
+      </p>
+    </header>
+
+    <div class="topic-layout">
+      <aside class="anchor-nav" aria-label="Índice da seção">
+        <div class="anchor-nav-title">Sumário Técnico</div>
+        <ul id="anchor-list">
+          <li><a href="#sec-nvme-sata">1. NVMe vs. SATA e Gerações PCIe</a></li>
+          <li><a href="#sec-dram-hmb">2. Controladoras, DRAM e HMB</a></li>
+          <li><a href="#sec-sim-ssd">3. Simulador de SSD e Carga</a></li>
+          <li><a href="#sec-matriz-uso">4. Matriz de Escolha por Uso</a></li>
+          <li><a href="#sec-raiox">5. Mitos vs. Realidade</a></li>
+          <li><a href="#sec-quiz">6. Quiz Prático</a></li>
+          <li><a href="#sec-referencias">7. Referências</a></li>
+        </ul>
+      </aside>
+
+      <main class="topic-main">
+        <section id="sec-nvme-sata">
+          <h2>1. NVMe vs. SATA e Gerações PCIe (Gen3 / Gen4 / Gen5)</h2>
+          <p>
+            <strong>SATA III</strong> limita-se a cerca de 550–600 MB/s e usa um protocolo desenhado originalmente para discos mecânicos. O protocolo <strong>NVMe</strong> (<em>Non-Volatile Memory Express</em>) opera sobre pistas <strong>PCIe</strong> com muito mais filas e paralelismo, entregando velocidades de leitura sequencial bem superiores.
+          </p>
+
+          <div class="spec-table-wrap">
+            <table class="spec-table">
+              <thead>
+                <tr>
+                  <th>Interface / Geração</th>
+                  <th>Leitura Sequencial Típica</th>
+                  <th>Papel no Setup</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>SATA III (6 Gbps)</strong></td>
+                  <td>~500–560 MB/s</td>
+                  <td>Biblioteca secundária, mídia/backups ou reaproveitamento de SSD/HDD</td>
+                </tr>
+                <tr>
+                  <td><strong>PCIe Gen3 x4 NVMe</strong></td>
+                  <td>~3.000–3.500 MB/s</td>
+                  <td>Excelente custo-benefício para SO e jogos em plataformas antigas ou de entrada</td>
+                </tr>
+                <tr>
+                  <td><strong>PCIe Gen4 x4 NVMe</strong></td>
+                  <td>~6.500–7.400 MB/s</td>
+                  <td>Padrão equilibrado para jogos atuais, DirectStorage e uso geral</td>
+                </tr>
+                <tr>
+                  <td><strong>PCIe Gen5 x4 NVMe</strong></td>
+                  <td>~10.000–14.500 MB/s</td>
+                  <td>Cargas pesadas de transferência/edição; dissipação térmica merece atenção</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="diagram-box">
+            <div class="diagram-top">
+              <span>DIAGRAMA: ROTAS NVMe (PISTAS PCIe) VS. SATA (HUB / CHIPSET)</span>
+              <span>VERMELHO = NVMe PCIe | SÓLIDA = SATA III</span>
+            </div>
+            <svg class="storage-svg" viewBox="0 0 600 175" role="img" aria-label="Comparação entre rota NVMe PCIe direta ou chipset e rota SATA">
+              <rect x="20" y="25" width="140" height="60" fill="var(--bg-surface)" stroke="currentColor" stroke-width="1.5"></rect>
+              <text x="90" y="52" text-anchor="middle" font-family="monospace" font-size="10" fill="currentColor">CPU / BARRAMENTO</text>
+              <text x="90" y="68" text-anchor="middle" font-family="monospace" font-size="8" fill="currentColor">PCIe Gen3 / Gen4 / Gen5</text>
+
+              <rect x="225" y="25" width="145" height="60" fill="var(--bg-surface)" stroke="currentColor" stroke-width="1.5"></rect>
+              <text x="297" y="52" text-anchor="middle" font-family="monospace" font-size="10" fill="currentColor">CHIPSET (PCH/FCH)</text>
+              <text x="297" y="68" text-anchor="middle" font-family="monospace" font-size="8" fill="currentColor">Rotas extras + SATA</text>
+
+              <rect x="425" y="20" width="155" height="54" fill="var(--bg-surface)" stroke="currentColor" stroke-width="1.5"></rect>
+              <text x="502" y="44" text-anchor="middle" font-family="monospace" font-size="9" fill="currentColor">SSD NVMe M.2</text>
+              <text x="502" y="60" text-anchor="middle" font-family="monospace" font-size="8" fill="var(--accent-red)">Protocolo NVMe</text>
+
+              <rect x="425" y="96" width="155" height="54" fill="var(--bg-surface)" stroke="currentColor" stroke-width="1.5"></rect>
+              <text x="502" y="120" text-anchor="middle" font-family="monospace" font-size="9" fill="currentColor">SSD SATA / HDD</text>
+              <text x="502" y="136" text-anchor="middle" font-family="monospace" font-size="8" fill="currentColor">Limite ~600 MB/s</text>
+
+              <line x1="160" y1="47" x2="425" y2="47" class="lane-nvme"></line>
+              <line x1="160" y1="68" x2="225" y2="68" class="lane-sata"></line>
+              <line x1="297" y1="85" x2="297" y2="123" class="lane-sata"></line>
+              <line x1="297" y1="123" x2="425" y2="123" class="lane-sata"></line>
+            </svg>
+          </div>
+        </section>
+
+        <section id="sec-dram-hmb">
+          <h2>2. Controladoras, Cache DRAM e HMB</h2>
+          <p>
+            A <strong>controladora</strong> gerencia leitura, escrita, nivelamento de desgaste (<em>wear leveling</em>) e a tabela de mapeamento de endereços lógicos para físicos (FTL).
+          </p>
+
+          <ul class="tech-list">
+            <li><strong>SSD com Cache DRAM:</strong> Possui um chip de memória DRAM dedicado no próprio SSD para armazenar a tabela de mapeamento, favorecendo escrita aleatória sustentada e cargas intensas.</li>
+            <li><strong>SSD DRAM-less com HMB (<em>Host Memory Buffer</em>):</strong> Sem chip DRAM próprio, reserva uma pequena parcela da RAM do sistema via PCIe para acelerar o mapeamento; em muitos cenários de jogos e uso doméstico, oferece desempenho competitivo com menor custo e consumo.</li>
+            <li><strong>Dissipação térmica em Gen4/Gen5:</strong> Controladoras de alta velocidade aquecem sob escrita contínua; dissipadores da placa-mãe ou do SSD ajudam a evitar <em>thermal throttling</em>.</li>
+          </ul>
+        </section>
+
+        <section id="sec-sim-ssd">
+          <h2>3. Simulador Interativo de SSD, Cache e Tempo de Carga</h2>
+          <p>
+            Compare o comportamento estimado de transferência sequencial, escrita sustentada, temperatura da controladora e tempo relativo de carregamento de cena/fase.
+          </p>
+
+          <div class="ssd-panel">
+            <div class="ssd-controls">
+              <div class="ssd-field">
+                <label for="ssd-type"><span>Tipo e Geração do Drive</span></label>
+                <select id="ssd-type">
+                  <option value="sata">SATA III (~550 MB/s)</option>
+                  <option value="gen3">NVMe PCIe Gen3 x4 (~3.400 MB/s)</option>
+                  <option value="gen4" selected>NVMe PCIe Gen4 x4 (~7.000 MB/s)</option>
+                  <option value="gen5">NVMe PCIe Gen5 x4 (~12.000 MB/s)</option>
+                </select>
+              </div>
+
+              <div class="ssd-field">
+                <label for="ssd-cache"><span>Arquitetura de Cache</span></label>
+                <select id="ssd-cache">
+                  <option value="dram" selected>Com Cache DRAM</option>
+                  <option value="hmb">DRAM-less com HMB</option>
+                  <option value="nodram">DRAM-less sem HMB</option>
+                </select>
+              </div>
+
+              <div class="ssd-field">
+                <label for="ssd-workload"><span>Cenário de Uso</span></label>
+                <select id="ssd-workload">
+                  <option value="game" selected>Carregamento de Jogo / Mundo Aberto</option>
+                  <option value="transfer">Cópia / Extração de Arquivos Grandes</option>
+                </select>
+              </div>
+
+              <div class="ssd-field">
+                <label for="ssd-heatsink">
+                  <span>Fluxo de Ar / Dissipador</span>
+                  <span id="ssd-cool-val">Médio</span>
+                </label>
+                <input id="ssd-heatsink" type="range" min="0" max="100" step="25" value="50">
+              </div>
+            </div>
+
+            <div class="ssd-presets">
+              <button type="button" class="btn-primary-red" id="ssd-cmd-gen4">Perfil: Gaming Gen4 + DRAM</button>
+              <button type="button" class="btn-ghost" id="ssd-cmd-gen5">Perfil: Gen5 Carga Pesada</button>
+              <button type="button" class="btn-ghost" id="ssd-cmd-sata">Perfil: Comparar com SATA</button>
+            </div>
+
+            <div id="ssd-metrics" class="ssd-metrics" aria-live="polite"></div>
+            <div id="ssd-diag" class="ssd-diag" aria-live="polite"></div>
+          </div>
+        </section>
+
+        <section id="sec-matriz-uso">
+          <h2>4. Matriz Prática de Escolha por Perfil</h2>
+          <p>Selecione um perfil para ver a recomendação objetiva de armazenamento.</p>
+
+          <div class="matrix-box">
+            <div class="matrix-tabs" id="matrix-tabs">
+              <button type="button" class="matrix-tab is-active" data-profile="gamer-main">SSD Principal (SO + Jogos)</button>
+              <button type="button" class="matrix-tab" data-profile="library-extra">Expansão de Biblioteca</button>
+              <button type="button" class="matrix-tab" data-profile="creator-heavy">Edição e Transferência Pesada</button>
+            </div>
+            <div id="matrix-output" class="matrix-output" aria-live="polite"></div>
+          </div>
+        </section>
+
+        <section id="sec-raiox">
+          <h2>5. Mitos vs. Realidade em Armazenamento</h2>
+          <div id="xray-container" class="xray-list"></div>
+        </section>
+
+        <section id="sec-quiz">
+          <h2>6. Quiz Prático</h2>
+          <div id="quiz-container" class="quiz-box"></div>
+        </section>
+
+        <section id="sec-referencias">
+          <h2>7. Referências Técnicas &amp; Aprofundamento</h2>
+          <div id="references-container" class="ref-grid"></div>
+        </section>
+      </main>
+    </div>
+
+    <footer class="editorial-footer">
+      <p>Desenvolvido por hackdiario para fins de Aprendizado Prático e Interativo. &copy; 2026 — Todos os direitos reservados.</p>
+    </footer>
+  </div>
+
+  <script src="./assets/scripts/main.js"></script>
+</body>
+</html>

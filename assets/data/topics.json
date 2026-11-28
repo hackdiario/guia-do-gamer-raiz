@@ -31,7 +31,7 @@
     "titulo": "Armazenamento NVMe, SATA e Controladoras DRAM",
     "resumo": "Diferenças reais entre gerações PCIe Gen3/4/5, cache DRAM vs HMB e impacto direto em tempos de carregamento.",
     "categoria": "Armazenamento",
-    "status": "Em breve",
+    "status": "Publicada",
     "slug": "armazenamento-nvme",
     "tags": ["SSD", "NVMe", "DRAM", "PCIe"]
   },

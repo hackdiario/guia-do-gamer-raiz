@@ -1,0 +1,97 @@
+{
+  "matrix": {
+    "gamer-main": {
+      "title": "SSD Principal (Sistema Operacional + Jogos)",
+      "detail": "Um bom NVMe PCIe Gen4 x4 (com DRAM ou HMB sólido) oferece ótimo equilíbrio entre preço, velocidade e disponibilidade. Para jogos, a transição de HDD ou SATA para NVMe traz o salto mais perceptível; entre Gen4 e Gen5, o ganho em carregamento de fases costuma ser modesto."
+    },
+    "library-extra": {
+      "title": "Expansão de Biblioteca de Jogos e Arquivos",
+      "detail": "Avalie custo por terabyte e slots disponíveis. Um SSD NVMe Gen3/Gen4 secundário ou até um SSD SATA (quando os slots M.2 já estão ocupados) atende bem bibliotecas grandes, lembrando de verificar possíveis compartilhamentos de portas no manual da placa-mãe."
+    },
+    "creator-heavy": {
+      "title": "Transferência Frequente de Arquivos Grandes e Produção",
+      "detail": "Priorize controladoras capazes de sustentar escritas longas, cache DRAM (ou boa gestão de SLC cache/HMB) e dissipação térmica adequada para evitar queda de velocidade por superaquecimento."
+    }
+  },
+  "xrays": [
+    {
+      "question": "Dobrar a velocidade sequencial do SSD (ex.: 7.000 MB/s para 14.000 MB/s) corta o tempo de carregamento de jogos pela metade?",
+      "answer": "Não. Carregar um jogo envolve descompressão, preparo de texturas/shaders, CPU e GPU — não apenas leitura sequencial bruta do drive."
+    },
+    {
+      "question": "SSD NVMe DRAM-less é sempre ruim?",
+      "answer": "Não. Modelos DRAM-less com HMB (Host Memory Buffer) funcionam bem para uso cotidiano e jogos, embora SSDs com DRAM costumem lidar melhor com escritas intensas e sustentadas."
+    },
+    {
+      "question": "Aumentar o espaço livre do SSD não faz diferença?",
+      "answer": "Manter margem livre ajuda a controladora no garbage collection, wear leveling e manutenção de cache SLC, evitando degradação quando o drive fica quase 100% cheio."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "q1",
+      "prompt": "Qual é o limite prático aproximado de transferência da interface SATA III em comparação a um SSD NVMe PCIe Gen4 x4?",
+      "options": [
+        "SATA III fica em torno de 500–600 MB/s, enquanto NVMe Gen4 x4 alcança cerca de 6.500–7.400 MB/s",
+        "SATA III alcança 12.000 MB/s e NVMe Gen4 fica em 550 MB/s",
+        "Ambos têm a mesma banda máxima de 600 MB/s"
+      ],
+      "correct": 0,
+      "explanation": "SATA III é limitado a ~6 Gbps (~550–600 MB/s reais), enquanto NVMe PCIe Gen4 x4 oferece largura de banda muito superior."
+    },
+    {
+      "id": "q2",
+      "prompt": "O que é HMB (Host Memory Buffer) em um SSD NVMe sem chip DRAM próprio?",
+      "options": [
+        "Recurso que permite ao SSD utilizar uma pequena porção da memória RAM do sistema via PCIe",
+        "Um tipo de cabo de energia extra para o slot M.2",
+        "Uma ventoinha acoplada à placa-mãe"
+      ],
+      "correct": 0,
+      "explanation": "HMB usa uma pequena fatia da RAM do host para auxiliar no mapeamento de endereços em drives DRAM-less."
+    },
+    {
+      "id": "q3",
+      "prompt": "Por que dissipadores em SSDs NVMe de alta velocidade são relevantes em cargas longas?",
+      "options": [
+        "Para reduzir o risco de thermal throttling da controladora sob uso contínuo",
+        "Para aumentar a capacidade de gigabytes do SSD",
+        "Para converter sinais SATA em USB"
+      ],
+      "correct": 0,
+      "explanation": "Controladoras sob transferência pesada aquecem e podem reduzir a velocidade para se proteger caso superaqueçam."
+    }
+  ],
+  "references": [
+    {
+      "category": "Padrões e Tecnologia",
+      "items": [
+        {
+          "title": "NVM Express (NVMe) Organization",
+          "url": "https://nvmexpress.org/",
+          "note": "Especificações oficiais do protocolo NVMe sobre PCIe."
+        },
+        {
+          "title": "Microsoft — DirectStorage Overview",
+          "url": "https://learn.microsoft.com/en-us/gaming/windows/directstorage",
+          "note": "Documentação sobre carregamento moderno de ativos de jogos via GPU/NVMe."
+        }
+      ]
+    },
+    {
+      "category": "Benchmarks e Análises",
+      "items": [
+        {
+          "title": "TechPowerUp — SSD Reviews & Storage Benchmarks",
+          "url": "https://www.techpowerup.com/review/?category=SSDs",
+          "note": "Testes de leitura/escrita, latência, cache e temperaturas de SSDs."
+        },
+        {
+          "title": "Tom's Hardware — Best SSDs & Storage Testing",
+          "url": "https://www.tomshardware.com/reviews/best-ssds,3891.html",
+          "note": "Guias e testes práticos de unidades NVMe e SATA."
+        }
+      ]
+    }
+  ]
+}
