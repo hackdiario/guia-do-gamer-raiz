@@ -1,0 +1,97 @@
+{
+  "symptoms": {
+    "vram-spike": {
+      "title": "Queda Brusca de FPS e Stutter ao Virar a Câmera / Carregar Áreas",
+      "detail": "Verifique o consumo de VRAM no overlay (ex.: MSI Afterburner/RTSS ou HWiNFO64). Se a VRAM estiver no teto da placa, reduzir a qualidade de texturas em um nível costuma resolver rapidamente sem perder tanta nitidez quanto baixar a resolução."
+    },
+    "low-gpu-util": {
+      "title": "Utilização da GPU Abaixo do Esperado com FPS Baixo",
+      "detail": "Pode indicar limitação de CPU/thread principal, gargalo de memória/latência, limite de quadros ativo ou cena muito pesada para a CPU. Subir a resolução costuma aumentar a carga na GPU sem necessariamente elevar o limite imposto pela CPU."
+    },
+    "high-gpu-util": {
+      "title": "GPU Próxima de 98–100% com Frametime Consistente",
+      "detail": "Em geral, indica que a GPU está entregando o máximo de desempenho possível para a resolução e os ajustes gráficos atuais — comportamento esperado quando a placa de vídeo é o fator limitante do quadro."
+    }
+  },
+  "xrays": [
+    {
+      "question": "Existe uma porcentagem 'mágica' de gargalo que resume qualquer PC?",
+      "answer": "Não. Calculadoras genéricas de gargalo na internet não medem o motor do jogo, a cena, a resolução, a taxa de atualização nem a memória/latência do sistema."
+    },
+    {
+      "question": "FPS médio alto significa jogabilidade lisa sem travadas?",
+      "answer": "Não. Picos isolados de frametime (stuttering) podem ocorrer mesmo quando a média de FPS parece alta."
+    },
+    {
+      "question": "Mais gigabytes de VRAM sempre deixam uma GPU fraca mais rápida?",
+      "answer": "Não. A capacidade de VRAM evita falta de memória para texturas/buffers, mas o poder de processamento gráfico e a largura de banda continuam determinando a velocidade base da GPU."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "q1",
+      "prompt": "Qual métrica revela melhor picos isolados de engasgo (stuttering) que podem ficar disfarçados em uma média alta de quadros?",
+      "options": [
+        "Frametime (tempo por quadro em milissegundos) e percentis baixos de FPS",
+        "Apenas o FPS médio da partida inteira",
+        "A capacidade nominal do SSD SATA"
+      ],
+      "correct": 0,
+      "explanation": "O frametime mostra o tempo gasto em cada quadro individual; picos em ms evidenciam engasgos mesmo com média elevada."
+    },
+    {
+      "id": "q2",
+      "prompt": "O que tende a ocorrer quando um jogo exige mais VRAM do que a placa de vídeo possui?",
+      "options": [
+        "Quedas acentuadas de desempenho e stutter por troca de dados fora da VRAM",
+        "Aumento automático do clock base da GPU em 500 MHz",
+        "Redução do consumo de energia do monitor"
+      ],
+      "correct": 0,
+      "explanation": "A falta de VRAM força tráfego pela memória principal/barramento e degrada a consistência dos quadros."
+    },
+    {
+      "id": "q3",
+      "prompt": "Se a GPU está em ~55% de uso em 1080p e o FPS não sobe ao reduzir a resolução, qual é a hipótese técnica principal?",
+      "options": [
+        "Outro fator (como CPU/threads, memória ou limite do motor do jogo) está limitando o teto de quadros antes da GPU saturar",
+        "A GPU precisa de mais cabo HDMI para ligar",
+        "O monitor está com brilho baixo"
+      ],
+      "correct": 0,
+      "explanation": "Quando diminuir a carga gráfica da GPU não eleva o FPS, o teto de quadros está sendo imposto fora da GPU."
+    }
+  ],
+  "references": [
+    {
+      "category": "Análises e Benchmarks de GPU",
+      "items": [
+        {
+          "title": "TechPowerUp — GPU Reviews & Relative Performance",
+          "url": "https://www.techpowerup.com/review/",
+          "note": "Benchmarks em múltiplas resoluções, consumo, temperaturas e frametime."
+        },
+        {
+          "title": "Gamers Nexus — GPU Benchmarks & Frametime Analysis",
+          "url": "https://gamersnexus.net/",
+          "note": "Análise de médias, 1% / 0.1% lows e consistência de entrega de quadros."
+        }
+      ]
+    },
+    {
+      "category": "Monitoramento e Ferramentas",
+      "items": [
+        {
+          "title": "GPU-Z",
+          "url": "https://www.techpowerup.com/gpuz/",
+          "note": "Inspecione VRAM total, largura de banda, clocks e uso de memória na aba Sensors."
+        },
+        {
+          "title": "HWiNFO64",
+          "url": "https://www.hwinfo.com/",
+          "note": "Monitore uso de GPU, VRAM alocada/dedicada, temperaturas e hot spot."
+        }
+      ]
+    }
+  ]
+}

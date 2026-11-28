@@ -58,7 +58,7 @@
     "titulo": "GPU, VRAM e Análise de Gargalo Real",
     "resumo": "Largura de banda, barramento de memória, esgotamento de VRAM e leitura de frametime vs FPS médio.",
     "categoria": "Hardware Base",
-    "status": "Em breve",
+    "status": "Publicada",
     "slug": "gpu-vram-e-gargalos",
     "tags": ["GPU", "VRAM", "Frametime", "Gargalo"]
   },
