@@ -501,7 +501,46 @@
     const svgM2Txt = document.getElementById("svg-m2-txt");
     const svgPchTxt = document.getElementById("svg-pch-txt");
 
+    const lineVrm = document.getElementById("hist-line-vrm");
+    const lineClock = document.getElementById("hist-line-clock");
+    const lineCurrent = document.getElementById("hist-line-current");
+
     if (!cpuEl || !telemetryEl) return;
+
+    const history = [];
+    const MAX_POINTS = 30;
+
+    function toPolylinePoints(values, minVal, maxVal, width, height, pad) {
+      if (values.length === 0) return "";
+      const usableW = width - pad * 2;
+      const usableH = height - pad * 2;
+      const stepX = values.length > 1 ? usableW / (MAX_POINTS - 1) : 0;
+
+      return values
+        .map((v, idx) => {
+          const clamped = Math.max(minVal, Math.min(maxVal, v));
+          const ratio = (clamped - minVal) / (maxVal - minVal || 1);
+          const x = (pad + idx * stepX).toFixed(1);
+          const y = (height - pad - ratio * usableH).toFixed(1);
+          return `${x},${y}`;
+        })
+        .join(" ");
+    }
+
+    function renderHistoryChart() {
+      if (!lineVrm || !lineClock || !lineCurrent) return;
+      const w = 360;
+      const h = 110;
+      const pad = 8;
+
+      const vrmSeries = history.map((item) => item.vrmTempC);
+      const clockSeries = history.map((item) => item.effectiveClockGhz);
+      const currentSeries = history.map((item) => item.vcoreCurrentA);
+
+      lineVrm.setAttribute("points", toPolylinePoints(vrmSeries, 25, 125, w, h, pad));
+      lineClock.setAttribute("points", toPolylinePoints(clockSeries, 2.0, 6.0, w, h, pad));
+      lineCurrent.setAttribute("points", toPolylinePoints(currentSeries, 10, 260, w, h, pad));
+    }
 
     function compute() {
       const baseTdp = Number(cpuEl.value);
@@ -521,9 +560,7 @@
       const idleFactor = 0.14 + 0.86 * Math.pow(loadPct, 1.15);
       const packagePowerW = Math.round(baseTdp * idleFactor * voltageFactor);
 
-      // Corrente estimada no Vcore (I = P / V)
       const vcoreCurrentA = Math.round(packagePowerW / vcore);
-      // Corrente aproximada no barramento 12V EPS (com eficiência ~88%)
       const eps12vCurrentA = (packagePowerW / (12 * 0.88)).toFixed(1);
 
       const vrmCap = { basic: 0.65, mid: 1.0, pro: 1.45 }[vrmTier];
@@ -574,7 +611,7 @@
           <span class="telemetry-sub">${isThrottling ? "THROTTLING ATIVO" : "Estável sem queda"}</span>
         </div>
         <div class="telemetry-card">
-          <span class="telemetry-label">PCIe GPU &amp; I/O</span>
+          <span class="telemetry-label">PCIe GPU & I/O</span>
           <span class="telemetry-value ${slotsMode === "shared" ? "is-warn" : ""}">${slotsMode === "shared" ? "x8 / Compartilhado" : "x16 Nativo"}</span>
           <span class="telemetry-sub">${ioState}</span>
         </div>
@@ -601,6 +638,10 @@
       }
 
       diagLogEl.innerHTML = `<strong>Diagnóstico em tempo real:</strong> ${diagText}`;
+
+      history.push({ vrmTempC, effectiveClockGhz, vcoreCurrentA });
+      if (history.length > MAX_POINTS) history.shift();
+      renderHistoryChart();
     }
 
     [cpuEl, vrmEl, loadEl, airEl, vcoreEl, slotsEl].forEach((ctrl) => {
@@ -624,6 +665,7 @@
     });
 
     btnReset?.addEventListener("click", () => {
+      history.length = 0;
       cpuEl.value = "105";
       vrmEl.value = "mid";
       loadEl.value = "85";

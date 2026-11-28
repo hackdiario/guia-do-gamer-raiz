@@ -638,6 +638,50 @@
       color: var(--text-primary);
     }
 
+    .lab-chart-box {
+      margin-top: 0.85rem;
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-page);
+      padding: 0.75rem;
+    }
+
+    .lab-chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .lab-chart-legend {
+      display: flex;
+      gap: 0.85rem;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .legend-swatch {
+      width: 10px;
+      height: 2px;
+      display: inline-block;
+    }
+
+    .lab-history-svg {
+      width: 100%;
+      height: 115px;
+      display: block;
+      background-color: var(--bg-subtle);
+      border: 1px solid var(--border-color);
+    }
+
     @media (max-width: 820px) {
       .lab-grid,
       .lab-controls,
@@ -1100,6 +1144,24 @@
                 </svg>
 
                 <div id="lab-diag-log" class="lab-log" aria-live="polite"></div>
+                <div class="lab-chart-box">
+                  <div class="lab-chart-header">
+                    <span>HISTÓRICO DE TELEMETRIA (ÚLTIMAS 30 LEITURAS)</span>
+                    <div class="lab-chart-legend">
+                      <span class="legend-item"><i class="legend-swatch" style="background: var(--accent-red);"></i>VRM (°C)</span>
+                      <span class="legend-item"><i class="legend-swatch" style="background: var(--text-primary);"></i>Clock (GHz)</span>
+                      <span class="legend-item"><i class="legend-swatch" style="background: var(--text-muted);"></i>Corrente (A)</span>
+                    </div>
+                  </div>
+                  <svg id="lab-history-svg" class="lab-history-svg" viewBox="0 0 360 110" role="img" aria-label="Gráfico de histórico de temperatura do VRM, clock e corrente">
+                    <line x1="0" y1="27.5" x2="360" y2="27.5" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="3 3"></line>
+                    <line x1="0" y1="55" x2="360" y2="55" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="3 3"></line>
+                    <line x1="0" y1="82.5" x2="360" y2="82.5" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="3 3"></line>
+                    <polyline id="hist-line-current" fill="none" stroke="var(--text-muted)" stroke-width="1.5" stroke-dasharray="4 3" points=""></polyline>
+                    <polyline id="hist-line-clock" fill="none" stroke="var(--text-primary)" stroke-width="2" points=""></polyline>
+                    <polyline id="hist-line-vrm" fill="none" stroke="var(--accent-red)" stroke-width="2.2" points=""></polyline>
+                  </svg>
+                </div>
               </div>
             </div>
           </div>
