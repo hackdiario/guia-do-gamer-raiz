@@ -49,7 +49,7 @@
     "titulo": "Configuração de BIOS/UEFI e Primeiro Boot",
     "resumo": "Checklist técnico pós-montagem: ordem de boot, Resizable BAR, curvas de fan e diagnóstico por LEDs/beeps.",
     "categoria": "Diagnóstico & Setup",
-    "status": "Em breve",
+    "status": "Publicada",
     "slug": "configuracao-bios",
     "tags": ["BIOS", "UEFI", "ReBAR", "Boot"]
   },

@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>06 — Configuração de BIOS/UEFI e Primeiro Boot | guia-do-gamer-raiz</title>
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('ggr-theme') ||
+        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+  <style>
+    .topic-layout {
+      display: grid;
+      grid-template-columns: 210px 1fr;
+      gap: 2.25rem;
+      align-items: start;
+      padding: 1.25rem 0 3rem;
+    }
+
+    .anchor-nav {
+      position: sticky;
+      top: 1.5rem;
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-surface);
+      padding: 1rem;
+    }
+
+    .anchor-nav-title {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.4rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .anchor-nav ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .anchor-nav a {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      display: block;
+      padding: 0.2rem 0.35rem;
+      border-left: 2px solid transparent;
+      transition: all var(--transition-fast);
+    }
+
+    .anchor-nav a:hover,
+    .anchor-nav a.is-active {
+      color: var(--accent-red);
+      border-left-color: var(--accent-red);
+      background-color: var(--bg-subtle);
+    }
+
+    .topic-main section {
+      margin-bottom: 3rem;
+      scroll-margin-top: 1.5rem;
+    }
+
+    .topic-main h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 0.85rem;
+      padding-bottom: 0.4rem;
+      border-bottom: 1px solid var(--border-strong);
+    }
+
+    .topic-main h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin: 1.35rem 0 0.5rem;
+    }
+
+    .topic-main p {
+      margin-bottom: 0.9rem;
+      color: var(--text-primary);
+    }
+
+    .tech-list {
+      margin: 0.75rem 0 1.25rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .tech-list li {
+      color: var(--text-secondary);
+    }
+
+    .tech-list strong {
+      color: var(--text-primary);
+    }
+
+    .spec-table-wrap {
+      overflow-x: auto;
+      margin: 1.25rem 0;
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-surface);
+    }
+
+    .spec-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+
+    .spec-table th,
+    .spec-table td {
+      padding: 0.7rem 0.85rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+      vertical-align: top;
+    }
+
+    .spec-table th {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background-color: var(--bg-subtle);
+      color: var(--text-primary);
+    }
+
+    .spec-table td {
+      color: var(--text-secondary);
+    }
+
+    .spec-table td strong {
+      color: var(--text-primary);
+    }
+
+    /* Fluxo POST / Debug LEDs */
+    .diagram-box {
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-surface);
+      padding: 1.25rem;
+      margin: 1.25rem 0;
+    }
+
+    .diagram-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-bottom: 0.85rem;
+    }
+
+    .post-svg {
+      width: 100%;
+      height: auto;
+      display: block;
+      background-color: var(--bg-subtle);
+      border: 1px solid var(--border-color);
+    }
+
+    .post-pulse {
+      stroke: var(--accent-red);
+      stroke-width: 2.3;
+      stroke-dasharray: 6 5;
+      fill: none;
+      animation: postDash 1.2s linear infinite;
+    }
+
+    @keyframes postDash {
+      to {
+        stroke-dashoffset: -22;
+      }
+    }
+
+    /* Simulador Interativo de UEFI / BIOS */
+    .bios-panel {
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-surface);
+      padding: 1.25rem;
+      margin: 1.25rem 0;
+    }
+
+    .bios-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.9rem;
+      margin-bottom: 1rem;
+    }
+
+    .bios-field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .bios-field label {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+    }
+
+    .bios-field select {
+      width: 100%;
+      padding: 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--text-primary);
+      background-color: var(--bg-page);
+      border: 1px solid var(--border-color);
+    }
+
+    .bios-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .btn-ghost {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      padding: 0.5rem 0.85rem;
+      background-color: var(--bg-page);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      cursor: pointer;
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--accent-red);
+    }
+
+    .bios-status-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.65rem;
+      border-top: 2px solid var(--border-strong);
+      padding-top: 1rem;
+    }
+
+    .bios-card {
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-page);
+      padding: 0.7rem 0.8rem;
+    }
+
+    .bios-card-label {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      display: block;
+    }
+
+    .bios-card-val {
+      font-family: var(--font-mono);
+      font-size: 0.92rem;
+      font-weight: 700;
+      margin-top: 0.2rem;
+      display: block;
+    }
+
+    .bios-card-sub {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      margin-top: 0.2rem;
+      display: block;
+    }
+
+    .is-warn {
+      color: var(--accent-red);
+    }
+
+    .bios-log {
+      margin-top: 0.85rem;
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-page);
+      padding: 0.75rem 0.85rem;
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      color: var(--text-secondary);
+    }
+
+    .bios-log strong {
+      color: var(--text-primary);
+    }
+
+    /* Checklist Interativo de Primeiro Boot */
+    .boot-checklist {
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-surface);
+      padding: 1.25rem;
+      margin: 1.25rem 0;
+    }
+
+    .boot-items {
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+      margin-top: 0.75rem;
+    }
+
+    .boot-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+      padding: 0.65rem 0.75rem;
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-page);
+      font-size: 0.88rem;
+      cursor: pointer;
+    }
+
+    .boot-row input {
+      margin-top: 0.2rem;
+      accent-color: var(--accent-red);
+      cursor: pointer;
+    }
+
+    .boot-progress {
+      margin-top: 0.85rem;
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      color: var(--text-secondary);
+    }
+
+    /* Raio-X e Quiz */
+    .xray-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin: 1.25rem 0;
+    }
+
+    .xray-card {
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-surface);
+    }
+
+    .xray-trigger {
+      width: 100%;
+      text-align: left;
+      background: none;
+      border: none;
+      color: var(--text-primary);
+      padding: 0.9rem 1rem;
+      font-family: var(--font-sans);
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .xray-trigger:hover {
+      background-color: var(--bg-subtle);
+    }
+
+    .xray-indicator {
+      font-family: var(--font-mono);
+      color: var(--accent-red);
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .xray-body {
+      display: none;
+      padding: 0 1rem 1rem;
+      border-top: 1px solid var(--border-color);
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    .xray-card.is-open .xray-body {
+      display: block;
+      padding-top: 0.85rem;
+    }
+
+    .quiz-box {
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-surface);
+      padding: 1.25rem;
+      margin: 1.25rem 0;
+    }
+
+    .quiz-question {
+      margin-bottom: 1.5rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .quiz-q-title {
+      font-weight: 700;
+      margin-bottom: 0.65rem;
+      font-size: 0.95rem;
+    }
+
+    .quiz-options {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .quiz-option-btn {
+      text-align: left;
+      padding: 0.6rem 0.8rem;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--text-primary);
+      background-color: var(--bg-page);
+      border: 1px solid var(--border-color);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .quiz-option-btn:hover:not(:disabled) {
+      border-color: var(--accent-red);
+    }
+
+    .quiz-option-btn.is-correct {
+      border-color: var(--border-strong);
+      background-color: var(--bg-subtle);
+      font-weight: 700;
+    }
+
+    .quiz-option-btn.is-wrong {
+      border-color: var(--accent-red);
+      color: var(--accent-red);
+    }
+
+    .quiz-feedback {
+      margin-top: 0.6rem;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      padding: 0.6rem 0.75rem;
+      background-color: var(--bg-subtle);
+      border-left: 2px solid var(--accent-red);
+    }
+
+    .btn-primary-red {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 0.65rem 1.1rem;
+      background-color: var(--accent-red);
+      color: var(--text-on-accent);
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-primary-red:hover {
+      background-color: var(--accent-red-hover);
+    }
+
+    .quiz-score {
+      margin-top: 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .ref-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .ref-card {
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-surface);
+      padding: 1rem;
+    }
+
+    .ref-card h3 {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      color: var(--accent-red);
+      margin-bottom: 0.65rem;
+    }
+
+    .ref-card ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+      font-size: 0.85rem;
+    }
+
+    .ref-card a {
+      color: var(--text-primary);
+      font-weight: 600;
+      text-decoration: none;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .ref-card a:hover {
+      color: var(--accent-red);
+      border-bottom-color: var(--accent-red);
+    }
+
+    .ref-card span {
+      display: block;
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      margin-top: 0.15rem;
+    }
+
+    @media (max-width: 820px) {
+      .topic-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .anchor-nav {
+        position: static;
+      }
+
+      .bios-grid,
+      .bios-status-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <button id="theme-toggle" class="bookmark-toggle" type="button" aria-label="Alternar tema claro/escuro" title="Alternar tema">
+    <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+    <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+    </svg>
+  </button>
+
+  <div class="container">
+    <nav class="breadcrumb" aria-label="Navegação estrutural">
+      <a href="../../index.html">&larr; Voltar ao Sumário</a>
+      <span>/</span>
+      <span>06. Diagnóstico &amp; Setup</span>
+    </nav>
+
+    <header class="editorial-header">
+      <div class="meta-bar">
+        <span>TRILHA: DIAGNÓSTICO &amp; SETUP</span>
+        <span>TÓPICO 06</span>
+      </div>
+      <h1 class="site-title">Configuração de BIOS/UEFI e Primeiro Boot</h1>
+      <p class="site-subtitle">
+        Checklist técnico pós-montagem: ordem de boot, Resizable BAR, curvas de fan e diagnóstico por LEDs/beeps.
+      </p>
+    </header>
+
+    <div class="topic-layout">
+      <aside class="anchor-nav" aria-label="Índice da seção">
+        <div class="anchor-nav-title">Sumário Técnico</div>
+        <ul id="anchor-list">
+          <li><a href="#sec-post-leds">1. Sequência POST e Debug LEDs</a></li>
+          <li><a href="#sec-uefi-ajustes">2. Ajustes Essenciais na UEFI</a></li>
+          <li><a href="#sec-fans-boot">3. Curvas de Fan e Ordem de Boot</a></li>
+          <li><a href="#sec-sim-bios">4. Simulador UEFI / POST</a></li>
+          <li><a href="#sec-checklist-boot">5. Checklist do 1º Boot</a></li>
+          <li><a href="#sec-raiox">6. Mitos vs. Realidade</a></li>
+          <li><a href="#sec-quiz">7. Quiz Prático</a></li>
+          <li><a href="#sec-referencias">8. Referências</a></li>
+        </ul>
+      </aside>
+
+      <main class="topic-main">
+        <section id="sec-post-leds">
+          <h2>1. Sequência POST e Diagnóstico por Debug LEDs</h2>
+          <p>
+            Ao ligar o PC, o firmware executa o <strong>POST</strong> (<em>Power-On Self-Test</em>), verificando energia, CPU, memória, placa de vídeo e dispositivos de boot antes de entregar o controle ao sistema operacional.
+          </p>
+
+          <div class="diagram-box">
+            <div class="diagram-top">
+              <span>ETAPAS TÍPICAS DO POST E DIAGNÓSTICO (DEBUG LEDs)</span>
+              <span>CPU &rarr; DRAM &rarr; VGA &rarr; BOOT</span>
+            </div>
+            <svg class="post-svg" viewBox="0 0 600 135" role="img" aria-label="Etapas do POST: CPU, DRAM, VGA e BOOT">
+              <rect x="18" y="32" width="120" height="62" fill="var(--bg-surface)" stroke="currentColor" stroke-width="1.5"></rect>
+              <text x="78" y="58" text-anchor="middle" font-family="monospace" font-size="10" fill="currentColor">1. CPU</text>
+              <text x="78" y="75" text-anchor="middle" font-family="monospace" font-size="8" fill="currentColor">Alimentação/Clock</text>
+
+              <rect x="166" y="32" width="120" height="62" fill="var(--bg-surface)" stroke="currentColor" stroke-width="1.5"></rect>
+              <text x="226" y="58" text-anchor="middle" font-family="monospace" font-size="10" fill="currentColor">2. DRAM</text>
+              <text x="226" y="75" text-anchor="middle" font-family="monospace" font-size="8" fill="currentColor">Treinamento RAM</text>
+
+              <rect x="314" y="32" width="120" height="62" fill="var(--bg-surface)" stroke="currentColor" stroke-width="1.5"></rect>
+              <text x="374" y="58" text-anchor="middle" font-family="monospace" font-size="10" fill="currentColor">3. VGA</text>
+              <text x="374" y="75" text-anchor="middle" font-family="monospace" font-size="8" fill="currentColor">Saída de vídeo</text>
+
+              <rect x="462" y="32" width="120" height="62" fill="var(--bg-surface)" stroke="currentColor" stroke-width="1.5"></rect>
+              <text x="522" y="58" text-anchor="middle" font-family="monospace" font-size="10" fill="currentColor">4. BOOT</text>
+              <text x="522" y="75" text-anchor="middle" font-family="monospace" font-size="8" fill="currentColor">SSD / USB instalador</text>
+
+              <line x1="138" y1="63" x2="166" y2="63" class="post-pulse"></line>
+              <line x1="286" y1="63" x2="314" y2="63" class="post-pulse"></line>
+              <line x1="434" y1="63" x2="462" y2="63" class="post-pulse"></line>
+            </svg>
+          </div>
+
+          <ul class="tech-list">
+            <li><strong>LED / código travado em DRAM:</strong> Reassente os pentes de memória, teste em slots recomendados (ex.: A2/B2) e aguarde o <em>memory training</em> (especialmente em DDR5 ou após reset de CMOS).</li>
+            <li><strong>LED / código travado em VGA:</strong> Confira alimentação auxiliar da GPU, encaixe no slot PCIe x16 e cabo de vídeo ligado à placa de vídeo (não à placa-mãe, salvo diagnóstico com vídeo integrado).</li>
+          </ul>
+        </section>
+
+        <section id="sec-uefi-ajustes">
+          <h2>2. Ajustes Essenciais na UEFI Após o Primeiro Boot</h2>
+          <div class="spec-table-wrap">
+            <table class="spec-table">
+              <thead>
+                <tr>
+                  <th>Opção UEFI</th>
+                  <th>Função</th>
+                  <th>Observação Prática</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>XMP / EXPO / DOCP</strong></td>
+                  <td>Aplica frequência e timings do kit de memória</td>
+                  <td>Ative após confirmar estabilidade inicial do sistema</td>
+                </tr>
+                <tr>
+                  <td><strong>Resizable BAR / Smart Access Memory</strong></td>
+                  <td>Permite à CPU acessar blocos maiores da VRAM da GPU</td>
+                  <td>Requer suporte da CPU, placa-mãe, GPU e modo UEFI/Above 4G Decoding</td>
+                </tr>
+                <tr>
+                  <td><strong>Modo de Boot (UEFI / GPT)</strong></td>
+                  <td>Define inicialização moderna via UEFI</td>
+                  <td>Padrão recomendado para sistemas atuais e recursos de segurança (ex.: fTPM/Secure Boot)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="sec-fans-boot">
+          <h2>3. Curvas de Fan e Ordem de Boot</h2>
+          <ul class="tech-list">
+            <li><strong>Curvas de ventoinha (PWM vs. DC):</strong> Ventoinhas de 4 pinos usam controle PWM; ventoinhas de 3 pinos usam controle por tensão (DC). Ajuste curvas graduais para equilibrar ruído e temperatura.</li>
+            <li><strong>Ordem de boot:</strong> Coloque o pendrive instalador em primeiro apenas durante a instalação do SO; depois, priorize o SSD com o sistema operacional.</li>
+          </ul>
+        </section>
+
+        <section id="sec-sim-bios">
+          <h2>4. Simulador Interativo de UEFI / POST</h2>
+          <p>
+            Simule o estado de boot e os parâmetros da UEFI ajustando versão de BIOS, encaixe de RAM, cabo de vídeo e opções de desempenho.
+          </p>
+
+          <div class="bios-panel">
+            <div class="bios-grid">
+              <div class="bios-field">
+                <label for="bios-ver"><span>BIOS para a CPU</span></label>
+                <select id="bios-ver">
+                  <option value="ok" selected>Compatível / Atualizada</option>
+                  <option value="old">Desatualizada para CPU nova</option>
+                </select>
+              </div>
+
+              <div class="bios-field">
+                <label for="bios-ram"><span>Memória RAM</span></label>
+                <select id="bios-ram">
+                  <option value="dual" selected>2 pentes em A2/B2 (encaixados)</option>
+                  <option value="loose">Mal encaixada / slot incorreto</option>
+                </select>
+              </div>
+
+              <div class="bios-field">
+                <label for="bios-xmp"><span>Perfil XMP / EXPO</span></label>
+                <select id="bios-xmp">
+                  <option value="off">Desativado (Padrão)</option>
+                  <option value="on" selected>Ativado</option>
+                </select>
+              </div>
+
+              <div class="bios-field">
+                <label for="bios-rebar"><span>Resizable BAR / 4G Decoding</span></label>
+                <select id="bios-rebar">
+                  <option value="on" selected>Habilitado</option>
+                  <option value="off">Desabilitado</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="bios-actions">
+              <button type="button" class="btn-primary-red" id="bios-cmd-test">Executar POST Simulado</button>
+              <button type="button" class="btn-ghost" id="bios-cmd-fault">Simular Falha DRAM/BIOS</button>
+              <button type="button" class="btn-ghost" id="bios-cmd-reset">Resetar</button>
+            </div>
+
+            <div id="bios-status-grid" class="bios-status-grid" aria-live="polite"></div>
+            <div id="bios-log" class="bios-log" aria-live="polite"></div>
+          </div>
+        </section>
+
+        <section id="sec-checklist-boot">
+          <h2>5. Checklist Interativo do Primeiro Boot</h2>
+          <div class="boot-checklist" id="boot-checklist">
+            <label class="boot-row">
+              <input type="checkbox" data-boot-check checked>
+              <span><strong>Cabos de energia verificados:</strong> ATX 24-pin, EPS 8-pin e cabos da GPU firmes e travados.</span>
+            </label>
+            <label class="boot-row">
+              <input type="checkbox" data-boot-check checked>
+              <span><strong>Monitor ligado na GPU:</strong> cabo HDMI/DisplayPort conectado à saída da placa de vídeo.</span>
+            </label>
+            <label class="boot-row">
+              <input type="checkbox" data-boot-check>
+              <span><strong>XMP/EXPO e ReBAR revisados:</strong> parâmetros ajustados e validados sem travamentos.</span>
+            </label>
+            <label class="boot-row">
+              <input type="checkbox" data-boot-check>
+              <span><strong>Curvas de fan e temperaturas conferidas:</strong> ventoinhas girando livremente e temperaturas sob controle.</span>
+            </label>
+            <div id="boot-progress" class="boot-progress" aria-live="polite"></div>
+          </div>
+        </section>
+
+        <section id="sec-raiox">
+          <h2>6. Mitos vs. Realidade em BIOS/UEFI</h2>
+          <div id="xray-container" class="xray-list"></div>
+        </section>
+
+        <section id="sec-quiz">
+          <h2>7. Quiz Prático</h2>
+          <div id="quiz-container" class="quiz-box"></div>
+        </section>
+
+        <section id="sec-referencias">
+          <h2>8. Referências Técnicas &amp; Aprofundamento</h2>
+          <div id="references-container" class="ref-grid"></div>
+        </section>
+      </main>
+    </div>
+
+    <footer class="editorial-footer">
+      <p>Desenvolvido por hackdiario para fins de Aprendizado Prático e Interativo. &copy; 2026 — Todos os direitos reservados.</p>
+    </footer>
+  </div>
+
+  <script src="./assets/scripts/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+{
+  "xrays": [
+    {
+      "question": "Atualizar a BIOS é obrigatório todo mês mesmo quando o PC funciona perfeitamente?",
+      "answer": "Não. Em geral, atualize quando houver correção importante de estabilidade, segurança ou suporte a processador/memória que você realmente utilize."
+    },
+    {
+      "question": "Dar Clear CMOS apaga meus arquivos pessoais do SSD?",
+      "answer": "Não. Clear CMOS restaura as configurações da BIOS/UEFI da placa-mãe para o padrão, não formata discos nem apaga arquivos do sistema operacional."
+    },
+    {
+      "question": "Ativar Resizable BAR sempre dá ganho enorme em todo jogo?",
+      "answer": "Não. Depende do jogo, do driver e da arquitetura; em alguns títulos há ganho mensurável e em outros o impacto é neutro ou exige teste específico."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "q1",
+      "prompt": "O PC liga as ventoinhas, mas o Debug LED da placa-mãe fica aceso em DRAM e não dá vídeo. Qual é o primeiro passo prático?",
+      "options": [
+        "Desligar da tomada, reencaixar os módulos de RAM nos slots recomendados (ex.: A2/B2) e testar novamente",
+        "Trocar o cabo de força do monitor por um cabo de rede",
+        "Formatar o SSD antes de entrar na UEFI"
+      ],
+      "correct": 0,
+      "explanation": "LED em DRAM indica falha ou dificuldade na inicialização/treinamento da memória; reencaixar e validar os slots é o passo inicial padrão."
+    },
+    {
+      "id": "q2",
+      "prompt": "Qual recurso na UEFI permite que a CPU acesse regiões maiores da memória de vídeo (VRAM) da GPU?",
+      "options": [
+        "Resizable BAR (com Above 4G Decoding habilitado)",
+        "CSM Legacy Mode",
+        "Eco Fan Stop"
+      ],
+      "correct": 0,
+      "explanation": "Resizable BAR amplia a janela de acesso da CPU à memória da GPU quando suportado pelo conjunto de hardware e firmware."
+    },
+    {
+      "id": "q3",
+      "prompt": "Após instalar o sistema operacional a partir de um pendrive, o que é boa prática na ordem de boot?",
+      "options": [
+        "Priorizar o SSD/unidade com o sistema operacional em vez de manter o pendrive em primeiro",
+        "Desativar o armazenamento NVMe na BIOS",
+        "Remover a bateria CMOS após cada reinicialização"
+      ],
+      "correct": 0,
+      "explanation": "Priorizar o drive do sistema evita iniciar novamente o instalador USB e acelera o boot normal."
+    }
+  ],
+  "references": [
+    {
+      "category": "Padrões de Firmware",
+      "items": [
+        {
+          "title": "UEFI Forum — Unified Extensible Firmware Interface",
+          "url": "https://uefi.org/",
+          "note": "Especificações oficiais da arquitetura de firmware UEFI."
+        },
+        {
+          "title": "Microsoft — Boot to UEFI Mode & BIOS Settings",
+          "url": "https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/boot-to-uefi-mode-or-bios",
+          "note": "Documentação técnica sobre inicialização UEFI e modos de boot."
+        }
+      ]
+    },
+    {
+      "category": "Diagnóstico e Utilitários",
+      "items": [
+        {
+          "title": "CPU-Z",
+          "url": "https://www.cpuid.com/softwares/cpu-z.html",
+          "note": "Verifique na aba Mainboard a versão e data da BIOS instalada."
+        },
+        {
+          "title": "HWiNFO64",
+          "url": "https://www.hwinfo.com/",
+          "note": "Acompanhe temperaturas, clocks e status de Resizable BAR / sensores do sistema."
+        }
+      ]
+    }
+  ]
+}
